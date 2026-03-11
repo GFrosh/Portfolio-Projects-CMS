@@ -180,7 +180,7 @@ No server-side validation exists because there is no backend.
 ## 10. Styling and Theming
 
 - Tailwind utility classes are used in components
-- Brand palette extends Tailwind config as `brand` colors
+- Brand palette and `font-sans` are declared in `src/index.css` with Tailwind theme tokens
 - Global styles loaded through `src/index.css`
 
 ## 11. Data Lifecycle (End-to-End)

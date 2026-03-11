@@ -1,22 +1,28 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+@theme {
+  --color-brand-50: #f0f4ff;
+  --color-brand-100: #dce6ff;
+  --color-brand-200: #b9ccff;
+  --color-brand-300: #85a8ff;
+  --color-brand-400: #4d7bff;
+  --color-brand-500: #2554f8;
+  --color-brand-600: #1538e7;
+  --color-brand-700: #1130cc;
+  --color-brand-800: #1429a6;
+  --color-brand-900: #152883;
+  --font-sans: 'Inter', system-ui, sans-serif;
+}
 
 @layer base {
   body {
     @apply bg-slate-950 text-slate-100 antialiased;
   }
-
-  * {
-    @apply box-border;
-  }
 }
 
-@layer utilities {
-  .scrollbar-thin {
-    scrollbar-width: thin;
-    scrollbar-color: theme('colors.slate.600') theme('colors.slate.800');
-  }
+@utility scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-slate-600) var(--color-slate-800);
 }

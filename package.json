@@ -3,9 +3,14 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
+  "engines": {
+    "node": ">=20.19.0"
+  },
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
+    "test": "vitest",
+    "test:run": "vitest run",
     "preview": "vite preview"
   },
   "license": "MIT",
@@ -15,14 +20,16 @@
     "uuid": "^13.0.0"
   },
   "devDependencies": {
+    "@testing-library/jest-dom": "^6.8.0",
+    "@testing-library/react": "^16.3.0",
+    "@tailwindcss/vite": "^4.2.1",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
-    "@types/uuid": "^11.0.0",
     "@vitejs/plugin-react": "^5.1.4",
-    "autoprefixer": "^10.4.27",
-    "postcss": "^8.5.8",
+    "jsdom": "^26.1.0",
     "tailwindcss": "^4.2.1",
     "typescript": "^5.9.3",
-    "vite": "^7.3.1"
+    "vite": "^7.3.1",
+    "vitest": "^3.2.4"
   }
 }
