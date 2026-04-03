@@ -12,6 +12,7 @@ A lightweight, client-side CMS for managing portfolio projects. Create, edit, vi
 - Sort by `updatedAt`, `createdAt`, or `title` (asc/desc)
 - Featured projects toggle
 - Modal-driven UI (create/edit/view/delete confirmation)
+- User authentication
 - Data persists in-browser using `localStorage` (no backend)
 
 ## Tech Stack
@@ -66,6 +67,17 @@ Run tests once (CI-style):
 npm run test:run
 ```
 
+## Authentication
+
+The app includes one local demo account:
+
+- User: `user@portfolio.local` / `user123`
+
+Auth persistence is local:
+
+- **Users key:** `portfolio_cms_auth_users`
+- **Session key:** `portfolio_cms_auth_session`
+
 ## How Data Persistence Works
 
 Projects are stored in the browser at:
@@ -78,7 +90,7 @@ Implications:
 
 - Data is **per-browser / per-device / per-origin**
 - Clearing site data clears your projects
-- No authentication, no server-side validation, no sync across devices
+- No server-side validation, no sync across devices
 
 ## Data Model
 
@@ -102,11 +114,26 @@ Forms use `ProjectFormData` (same shape minus `id`, `createdAt`, `updatedAt`).
 ## Project Structure (high-level)
 
 - `src/main.tsx` – app bootstrap
-- `src/App.tsx` – toolbar state, filtering/sorting, modal routing
-- `src/hooks/useProjects.ts` – project state + CRUD + persistence calls
-- `src/utils/storage.ts` – `localStorage` load/save helpers
+- `src/App.tsx` – auth gate, toolbar state, filtering/sorting, modal routing
+- `src/hooks/useAuth.ts` – auth state + sign-in/sign-out flows
+- `src/data/auth/repository.ts` – auth repository (current local adapter)
+- `src/hooks/useProjects.ts` – project state + CRUD + repository calls
+- `src/data/projects/repository.ts` – project repository contract
+- `src/data/projects/localProjectRepository.ts` – local project adapter
 - `src/types/project.ts` – domain types
+- `src/types/auth.ts` – auth domain types
 - `src/components/` – UI components (cards, forms, modals, etc.)
+
+## DB Integration Path
+
+The app now uses repository contracts for both projects and auth.
+
+To integrate a database, add new adapters (for example API-backed repositories) that implement:
+
+- `AuthRepository` in `src/types/auth.ts`
+- `ProjectRepository` in `src/data/projects/repository.ts`
+
+Then switch the exported repository instance to the DB-backed implementation.
 
 ## Contributing / Extending
 

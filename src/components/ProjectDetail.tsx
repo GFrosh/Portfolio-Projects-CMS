@@ -98,7 +98,6 @@ export default function ProjectDetail({ project, onEdit }: ProjectDetailProps) {
         </div>
       )}
 
-      {/* Edit button */}
       <div className="flex justify-end pt-2 border-t border-slate-800">
         <button
           onClick={onEdit}

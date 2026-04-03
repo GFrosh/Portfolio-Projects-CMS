@@ -1,14 +1,14 @@
 import { useState, useCallback } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import type { Project, ProjectFormData } from '../types/project';
-import { loadProjects, saveProjects } from '../utils/storage';
+import { projectRepository } from '../data/projects/localProjectRepository';
 
 export function useProjects() {
-  const [projects, setProjects] = useState<Project[]>(loadProjects);
+  const [projects, setProjects] = useState<Project[]>(() => projectRepository.loadProjects());
 
   const persist = useCallback((updated: Project[]) => {
     setProjects(updated);
-    saveProjects(updated);
+    projectRepository.saveProjects(updated);
   }, []);
 
   const addProject = useCallback((data: ProjectFormData): Project => {

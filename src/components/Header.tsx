@@ -1,10 +1,14 @@
+import type { AuthUser } from '../types/auth';
+
 interface HeaderProps {
   totalProjects: number;
   publishedCount: number;
+  currentUser: AuthUser;
   onNewProject: () => void;
+  onSignOut: () => Promise<void>;
 }
 
-export default function Header({ totalProjects, publishedCount, onNewProject }: HeaderProps) {
+export default function Header({ totalProjects, publishedCount, currentUser, onNewProject, onSignOut }: HeaderProps) {
   return (
     <header className="border-b border-slate-800 bg-slate-900/80 backdrop-blur-sm sticky top-0 z-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -25,15 +29,26 @@ export default function Header({ totalProjects, publishedCount, onNewProject }: 
           </div>
 
           {/* Actions */}
-          <button
-            onClick={onNewProject}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-brand-600 hover:bg-brand-500 active:bg-brand-700 text-white text-sm font-medium transition-colors"
-          >
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-            </svg>
-            New Project
-          </button>
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="hidden sm:block text-right">
+              <p className="text-xs font-medium text-slate-300">{currentUser.name}</p>
+            </div>
+            <button
+              onClick={onNewProject}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-brand-600 hover:bg-brand-500 active:bg-brand-700 text-white text-sm font-medium transition-colors"
+            >
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+              </svg>
+              New Project
+            </button>
+            <button
+              onClick={onSignOut}
+              className="inline-flex items-center gap-2 px-3 py-2 rounded-lg border border-slate-700 hover:border-slate-600 text-slate-300 hover:text-white text-sm transition-colors"
+            >
+              Sign Out
+            </button>
+          </div>
         </div>
       </div>
     </header>
