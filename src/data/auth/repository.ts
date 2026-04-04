@@ -1,21 +1,21 @@
 import type { AuthRepository, AuthSignUpData, AuthUser, SignInResult } from '../../types/auth';
 
 interface LocalAuthUserRecord extends AuthUser {
-  password: string;
+  	password: string;
 }
 
 const USERS_KEY = 'portfolio_cms_auth_users';
 const SESSION_KEY = 'portfolio_cms_auth_session';
 
 const SEED_USERS: LocalAuthUserRecord[] = [
-  {
-    id: 'user-1',
-    name: 'Portfolio User',
-    email: 'user@portfolio.local',
-    password: 'user123',
-    createdAt: '2026-01-01T00:00:00.000Z',
-    lastLoginAt: null,
-  },
+	{
+		id: 'user-1',
+		name: 'Portfolio User',
+		email: 'user@portfolio.local',
+		password: 'user123',
+		createdAt: '2026-01-01T00:00:00.000Z',
+		lastLoginAt: null,
+	}
 ];
 
 function toPublicUser(record: LocalAuthUserRecord): AuthUser {
