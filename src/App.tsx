@@ -7,6 +7,8 @@ import ProjectDetail from './components/ProjectDetail';
 import ConfirmDialog from './components/ConfirmDialog';
 import EmptyState from './components/EmptyState';
 import { useProjects } from './hooks/useProjects';
+import { useAuth } from './hooks/useAuth';
+import LoginScreen from './components/LoginScreen';
 import type { Project, FilterStatus, SortField, SortOrder } from './types/project';
 
 type ModalMode =
@@ -16,6 +18,7 @@ type ModalMode =
   | { type: 'delete'; projectId: string; title: string };
 
 export default function App() {
+  const { user, isReady, isAuthenticating, error: authError, signIn, signUp, signOut } = useAuth();
   const { projects, addProject, updateProject, deleteProject } = useProjects();
   const [modal, setModal] = useState<ModalMode | null>(null);
 
@@ -59,11 +62,36 @@ export default function App() {
 
   const closeModal = () => setModal(null);
 
+  if (!isReady) {
+    return (
+      <main className="min-h-screen flex items-center justify-center text-slate-300 bg-slate-950">
+        Loading authentication...
+      </main>
+    );
+  }
+
+  if (!user) {
+    return (
+      <LoginScreen
+        isSubmitting={isAuthenticating}
+        error={authError}
+        onSignIn={async (credentials) => {
+          await signIn(credentials);
+        }}
+        onSignUp={async (data) => {
+          await signUp(data);
+        }}
+      />
+    );
+  }
+
   return (
     <div className="min-h-screen flex flex-col font-sans">
       <Header
         totalProjects={projects.length}
         publishedCount={publishedCount}
+        currentUser={user}
+        onSignOut={signOut}
         onNewProject={() => setModal({ type: 'create' })}
       />
 
