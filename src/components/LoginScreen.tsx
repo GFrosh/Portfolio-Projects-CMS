@@ -11,16 +11,15 @@ interface LoginScreenProps {
 export default function LoginScreen({ isSubmitting, error, onSignIn, onSignUp }: LoginScreenProps) {
 	const [mode, setMode] = useState<'signin' | 'signup'>('signin');
 	const [name, setName] = useState('');
-	const [email, setEmail] = useState('user@portfolio.local');
-	const [password, setPassword] = useState('user123');
+	const [email, setEmail] = useState('gideononyegbula@example.com');
+	const [password, setPassword] = useState('password123');
 
 	const submit = async (event: React.SubmitEvent<HTMLFormElement>) => {
 		event.preventDefault();
 		if (mode === 'signup') {
-		await onSignUp({ name, email, password });
-		return;
+			await onSignUp({ name, email, password });
+			return;
 		}
-
 		await onSignIn({ email, password });
 	};
 

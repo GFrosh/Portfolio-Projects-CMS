@@ -61,9 +61,7 @@ export class LocalAuthRepository implements AuthRepository {
     const users = loadUsers();
     const index = users.findIndex((u) => u.email.toLowerCase() === email && u.password === emailAndPassword.password);
 
-    if (index === -1) {
-      return null;
-    }
+    if (index === -1) return null;
 
     const updatedUser: LocalAuthUserRecord = {
       ...users[index],

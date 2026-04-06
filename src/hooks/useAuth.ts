@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { authRepository } from '../data/auth/repository';
 import type { AuthCredentials, AuthSignUpData, AuthUser } from '../types/auth';
+import Portal from '../data/auth/Portal';
 
 export function useAuth() {
 	const [user, setUser] = useState<AuthUser | null>(null);
@@ -28,9 +29,9 @@ export function useAuth() {
 		setError(null);
 
 		try {
-			const result = await authRepository.signIn(credentials);
-			if (!result) {
-				setError('Invalid email or password.');
+			const result = await Portal.signIn(credentials);
+			if (!result.success || !result.user) {
+				setError(result.message || 'Invalid email or password.');
 				return false;
 			}
 
@@ -46,9 +47,9 @@ export function useAuth() {
 		setError(null);
 
 		try {
-			const result = await authRepository.signUp(data);
-			if (!result) {
-				setError('Unable to create account. Email may already exist or fields are invalid.');
+			const result = await Portal.signup(data);
+			if (!result.success || !result.user) {
+				setError(result.message || 'Unable to create account.');
 				return false;
 			}
 
@@ -60,7 +61,12 @@ export function useAuth() {
 	}, []);
 
 	const signOut = useCallback(async () => {
-		await authRepository.signOut();
+		const ok = await Portal.logout();
+		if (!ok) {
+			setError('Unable to sign out right now.');
+			return;
+		}
+
 		setUser(null);
 		setError(null);
 	}, []);
