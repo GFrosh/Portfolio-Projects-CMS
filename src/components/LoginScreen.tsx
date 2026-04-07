@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { AuthCredentials, AuthSignUpData } from '../types/auth';
 
 interface LoginScreenProps {
@@ -6,13 +6,18 @@ interface LoginScreenProps {
     error: string | null;
     onSignIn: (credentials: AuthCredentials) => Promise<void>;
     onSignUp: (data: AuthSignUpData) => Promise<void>;
+    initialMode?: 'signin' | 'signup';
 }
 
-export default function LoginScreen({ isSubmitting, error, onSignIn, onSignUp }: LoginScreenProps) {
-	const [mode, setMode] = useState<'signin' | 'signup'>('signin');
+export default function LoginScreen({ isSubmitting, error, onSignIn, onSignUp, initialMode = 'signin' }: LoginScreenProps) {
+	const [mode, setMode] = useState<'signin' | 'signup'>(initialMode);
 	const [name, setName] = useState('');
 	const [email, setEmail] = useState('gideononyegbula@example.com');
 	const [password, setPassword] = useState('password123');
+
+	useEffect(() => {
+		setMode(initialMode);
+	}, [initialMode]);
 
 	const submit = async (event: React.SubmitEvent<HTMLFormElement>) => {
 		event.preventDefault();

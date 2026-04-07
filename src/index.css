@@ -3,22 +3,35 @@
 @import "tailwindcss";
 
 @theme {
-  --color-brand-50: #f0f4ff;
-  --color-brand-100: #dce6ff;
-  --color-brand-200: #b9ccff;
-  --color-brand-300: #85a8ff;
-  --color-brand-400: #4d7bff;
-  --color-brand-500: #2554f8;
-  --color-brand-600: #1538e7;
-  --color-brand-700: #1130cc;
-  --color-brand-800: #1429a6;
-  --color-brand-900: #152883;
+  --color-brand-50: #fff4e8;
+  --color-brand-100: #ffe4c7;
+  --color-brand-200: #ffc688;
+  --color-brand-300: #ffa54d;
+  --color-brand-400: #ff8720;
+  --color-brand-500: #f56a00;
+  --color-brand-600: #cf5000;
+  --color-brand-700: #a63d03;
+  --color-brand-800: #873208;
+  --color-brand-900: #6e2a0c;
+  --color-slate-50: #f5f8fb;
+  --color-slate-100: #e7eef5;
+  --color-slate-200: #cddae7;
+  --color-slate-300: #a9bed4;
+  --color-slate-400: #7f9bb8;
+  --color-slate-500: #5f7f9f;
+  --color-slate-600: #466483;
+  --color-slate-700: #324b66;
+  --color-slate-800: #1e3349;
+  --color-slate-900: #142637;
+  --color-slate-950: #0b1724;
   --font-sans: 'Inter', system-ui, sans-serif;
 }
 
 @layer base {
   body {
-    @apply bg-slate-950 text-slate-100 antialiased;
+    @apply text-slate-100 antialiased;
+    background-color: var(--color-slate-950);
+    background-image: radial-gradient(circle at 12% -10%, rgba(245, 106, 0, 0.18), transparent 35%), radial-gradient(circle at 86% 0%, rgba(70, 100, 131, 0.32), transparent 34%);
   }
 }
 

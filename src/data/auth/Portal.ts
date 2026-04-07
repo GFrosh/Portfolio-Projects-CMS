@@ -30,17 +30,7 @@ export default class Portal {
 
     static async signIn(payload: AuthCredentials): Promise<ResponseObject> {
         try {
-            let { res, body } = await Portal.post("/signin", payload);
-
-            // Some backends expose auth routes under /api/auth.
-            if (res.status === 404) {
-                ({ res, body } = await Portal.post("/api/auth/signin", payload));
-            }
-
-            // Some backends expose /login instead of /signin.
-            if (res.status === 404) {
-                ({ res, body } = await Portal.post("/api/auth/login", payload));
-            }
+            let { res, body } = await this.post("/api/auth/login", payload);
 
             if (!res.ok) {
                 return {
@@ -57,7 +47,11 @@ export default class Portal {
                 data: body,
             };
         } catch (error) {
-            return { success: false, message: "An error occurred during sign-in.", error };
+            return {
+                success: false,
+                message: "An error occurred during sign-in.",
+                error
+            };
         }
     }
 
@@ -94,49 +88,27 @@ export default class Portal {
                 data: body,
             };
         } catch (error) {
-            return { success: false, message: "An error occurred during sign-up.", error };
+            return {
+                success: false,
+                message: "An error occurred during sign-up.",
+                error
+            };
         }
     }
 
     static async logout(): Promise<boolean> {
         try {
-            let res = await fetch(`${Portal.BASE_URL}/logout`, {
+            let res = await fetch(`${Portal.BASE_URL}/api/auth/logout`, {
                 method: "POST",
                 credentials: "include"
             });
 
-            // Some backends expose auth routes under /api/auth.
-            if (res.status === 404) {
-                res = await fetch(`${Portal.BASE_URL}/api/auth/logout`, {
-                    method: "POST",
-                    credentials: "include"
-                });
-            }
-
-            // Some backends expose /signout instead of /logout.
-            if (res.status === 404) {
-                res = await fetch(`${Portal.BASE_URL}/signout`, {
-                    method: "POST",
-                    credentials: "include"
-                });
-            }
-
-            if (res.status === 404) {
-                res = await fetch(`${Portal.BASE_URL}/api/auth/signout`, {
-                    method: "POST",
-                    credentials: "include"
-                });
-            }
-
-            const body = await Portal.safeJson(res);
-            if (!res.ok) {
-                return false;
-            }
+            const body = await this.safeJson(res);
+            if (!res.ok) return false;
 
             if (body && typeof body.success === "boolean") {
                 return body.success;
             }
-
             return true;
         } catch (error) {
             return false;
