@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useState } from 'react';
-import { authRepository } from '../data/auth/repository';
 import type { AuthCredentials, AuthSignUpData, AuthUser } from '../types/auth';
 import Portal from '../data/auth/Portal';
 
@@ -12,8 +11,8 @@ export function useAuth() {
 	useEffect(() => {
 		let active = true;
 
-		(async () => {
-			const currentUser = await authRepository.getCurrentUser();
+		(() => {
+			const currentUser = Portal.getUser();
 			if (!active) return;
 			setUser(currentUser);
 			setIsReady(true);

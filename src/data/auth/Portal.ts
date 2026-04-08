@@ -1,8 +1,9 @@
-import { AuthCredentials, AuthSignUpData } from "../../types/auth";
+import { AuthCredentials, AuthSignUpData, AuthUser } from "../../types/auth";
 import type { ResponseObject } from "../../types/Response";
 
 export default class Portal {
     private static readonly BASE_URL = ((import.meta as any).env?.VITE_API_BASE_URL as string | undefined) ?? "http://localhost:3000";
+    private static readonly USER_KEY = ((import.meta as any).env?.VITE_USER_KEY as string | undefined) ?? 'portfolio_cms_auth_user';
 
     private static async safeJson(res: Response): Promise<any> {
         const text = await res.text();
@@ -40,6 +41,9 @@ export default class Portal {
                 };
             }
 
+
+            this.saveUser(body?.user ?? null);
+
             return {
                 success: body?.success ?? true,
                 message: body?.message ?? "Sign-in successful.",
@@ -57,21 +61,7 @@ export default class Portal {
 
     static async signup(payload: AuthSignUpData): Promise<ResponseObject> {
         try {
-            let { res, body } = await Portal.post("/signup", payload);
-
-            // Some backends expose auth routes under /api/auth.
-            if (res.status === 404) {
-                ({ res, body } = await Portal.post("/api/auth/signup", payload));
-            }
-
-            // Some backends expose /register instead of /signup.
-            if (res.status === 404) {
-                ({ res, body } = await Portal.post("/register", payload));
-            }
-
-            if (res.status === 404) {
-                ({ res, body } = await Portal.post("/api/auth/register", payload));
-            }
+            let { res, body } = await Portal.post("/api/auth/signup", payload);
 
             if (!res.ok) {
                 return {
@@ -80,6 +70,7 @@ export default class Portal {
                     error: body,
                 };
             }
+            this.saveUser(body?.user ?? null);
 
             return {
                 success: body?.success ?? true,
@@ -106,6 +97,8 @@ export default class Portal {
             const body = await this.safeJson(res);
             if (!res.ok) return false;
 
+            this.clearUser();
+
             if (body && typeof body.success === "boolean") {
                 return body.success;
             }
@@ -113,5 +106,25 @@ export default class Portal {
         } catch (error) {
             return false;
         }
+    }
+
+    static getUser(): AuthUser | null {
+        try {
+            const rawUser = localStorage.getItem(this.USER_KEY);
+            return rawUser ? JSON.parse(rawUser) : null;
+        } catch {
+            return null;
+        }
+
+    }
+
+    static saveUser(user: AuthUser | null): void {
+        if (user) {
+            localStorage.setItem(this.USER_KEY, JSON.stringify(user));
+        }
+    }
+
+    static clearUser(): void {
+        localStorage.removeItem(this.USER_KEY);
     }
 }
