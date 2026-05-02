@@ -1,6 +1,20 @@
 import { useState, KeyboardEvent } from 'react';
 import type { ProjectFormData } from '../types/project';
 
+interface GitHubRepo {
+  id: number;
+  name: string;
+  full_name: string;
+  description: string | null;
+  html_url: string;
+  homepage: string | null;
+  language: string | null;
+  topics?: string[];
+  stargazers_count: number;
+  forks_count: number;
+  open_issues_count: number;
+}
+
 const EMPTY_FORM: ProjectFormData = {
   title: '',
   description: '',
@@ -24,6 +38,12 @@ export default function ProjectForm({ initial, onSubmit, onCancel, submitLabel }
   const [form, setForm] = useState<ProjectFormData>(initial ?? EMPTY_FORM);
   const [tagInput, setTagInput] = useState('');
   const [errors, setErrors] = useState<Partial<Record<keyof ProjectFormData, string>>>({});
+  const [githubUsername, setGithubUsername] = useState('');
+  const [githubRepos, setGithubRepos] = useState<GitHubRepo[]>([]);
+  const [selectedRepo, setSelectedRepo] = useState('');
+  const [loadingRepos, setLoadingRepos] = useState(false);
+  const [loadingRepoDetails, setLoadingRepoDetails] = useState(false);
+  const [githubError, setGithubError] = useState('');
 
   const set = <K extends keyof ProjectFormData>(key: K, value: ProjectFormData[K]) => {
     setForm((f) => ({ ...f, [key]: value }));
@@ -63,12 +83,150 @@ export default function ProjectForm({ initial, onSubmit, onCancel, submitLabel }
     return Object.keys(newErrors).length === 0;
   };
 
+  const fetchRepos = async () => {
+    const username = githubUsername.trim();
+    if (!username) {
+      setGithubError('GitHub username is required.');
+      return;
+    }
+
+    setLoadingRepos(true);
+    setGithubError('');
+    setSelectedRepo('');
+
+    try {
+      const res = await fetch(`https://api.github.com/users/${encodeURIComponent(username)}/repos?per_page=100&sort=updated`, {
+        headers: { Accept: 'application/vnd.github+json' },
+      });
+
+      if (!res.ok) {
+        if (res.status === 404) {
+          throw new Error('GitHub user not found.');
+        }
+        throw new Error('Failed to fetch repositories from GitHub.');
+      }
+
+      const repos = (await res.json()) as GitHubRepo[];
+      setGithubRepos(repos);
+      if (repos.length === 0) {
+        setGithubError('No public repositories found for this user.');
+      }
+    } catch (error) {
+      setGithubRepos([]);
+      setGithubError(error instanceof Error ? error.message : 'Could not load repositories.');
+    } finally {
+      setLoadingRepos(false);
+    }
+  };
+
+  const fetchRepoDetailsAndFill = async (repoFullName: string) => {
+    if (!repoFullName) return;
+
+    setLoadingRepoDetails(true);
+    setGithubError('');
+
+    try {
+      const res = await fetch(`https://api.github.com/repos/${repoFullName}`, {
+        headers: { Accept: 'application/vnd.github+json' },
+      });
+
+      if (!res.ok) {
+        throw new Error('Failed to fetch repository details.');
+      }
+
+      const repo = (await res.json()) as GitHubRepo;
+      const description = repo.description ?? '';
+      const longDescriptionParts = [
+        description,
+        repo.language ? `Primary language: ${repo.language}.` : '',
+        `Stars: ${repo.stargazers_count}.`,
+        `Forks: ${repo.forks_count}.`,
+        `Open issues: ${repo.open_issues_count}.`,
+      ].filter(Boolean);
+
+      const normalizedTitle = repo.name
+        .replace(/[-_]+/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+
+      const mergedTags = Array.from(new Set([
+        ...form.tags,
+        ...(repo.topics ?? []),
+        ...(repo.language ? [repo.language] : []),
+      ])).filter((tag) => tag.trim().length > 0);
+
+      setForm((prev) => ({
+        ...prev,
+        title: normalizedTitle || prev.title,
+        description: description || prev.description,
+        longDescription: longDescriptionParts.join(' ') || prev.longDescription,
+        githubUrl: repo.html_url || prev.githubUrl,
+        demoUrl: repo.homepage || prev.demoUrl,
+        tags: mergedTags,
+      }));
+    } catch (error) {
+      setGithubError(error instanceof Error ? error.message : 'Could not load repository details.');
+    } finally {
+      setLoadingRepoDetails(false);
+    }
+  };
+
   const handleSubmit = () => {
     if (validate()) onSubmit(form);
   };
 
   return (
     <div className="space-y-5">
+      {/* GitHub import */}
+      <Field label="Import From GitHub" hint="Fetch repos and auto-fill fields">
+        <div className="space-y-2">
+          <div className="grid grid-cols-1 sm:grid-cols-[1fr_auto] gap-2">
+            <input
+              type="text"
+              value={githubUsername}
+              onChange={(e) => setGithubUsername(e.target.value)}
+              placeholder="GitHub username"
+              className={input(false)}
+            />
+            <button
+              type="button"
+              onClick={fetchRepos}
+              disabled={loadingRepos}
+              className="px-4 py-2 rounded-lg bg-slate-700 hover:bg-slate-600 disabled:opacity-60 disabled:cursor-not-allowed text-white text-sm font-medium transition-colors"
+            >
+              {loadingRepos ? 'Loading…' : 'Load Repos'}
+            </button>
+          </div>
+
+          {githubRepos.length > 0 && (
+            <div className="grid grid-cols-1 sm:grid-cols-[1fr_auto] gap-2">
+              <select
+                value={selectedRepo}
+                onChange={(e) => setSelectedRepo(e.target.value)}
+                className={input(false)}
+              >
+                <option value="">Select a repository</option>
+                {githubRepos.map((repo) => (
+                  <option key={repo.id} value={repo.full_name}>
+                    {repo.full_name}
+                  </option>
+                ))}
+              </select>
+              <button
+                type="button"
+                onClick={() => fetchRepoDetailsAndFill(selectedRepo)}
+                disabled={!selectedRepo || loadingRepoDetails}
+                className="px-4 py-2 rounded-lg bg-brand-700 hover:bg-brand-600 disabled:opacity-60 disabled:cursor-not-allowed text-white text-sm font-medium transition-colors"
+              >
+                {loadingRepoDetails ? 'Importing…' : 'Import Repo'}
+              </button>
+            </div>
+          )}
+
+          {githubError && <p className="text-xs text-red-400">{githubError}</p>}
+        </div>
+      </Field>
+
       {/* Title */}
       <Field label="Title" error={errors.title} required>
         <input
