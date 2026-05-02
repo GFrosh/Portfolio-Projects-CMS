@@ -5,7 +5,7 @@ export default class Portal {
     private static readonly BASE_URL = ((import.meta as any).env?.VITE_API_BASE_URL as string | undefined) ?? "http://localhost:3000";
     private static readonly USER_KEY = ((import.meta as any).env?.VITE_USER_KEY as string | undefined) ?? 'portfolio_cms_auth_user';
 
-    private static async safeJson(res: Response): Promise<any> {
+    public static async safeJson(res: Response): Promise<any> {
         const text = await res.text();
         if (!text) return null;
 
