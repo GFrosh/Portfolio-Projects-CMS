@@ -2,8 +2,8 @@ import { AuthCredentials, AuthSignUpData, AuthUser } from "../../types/auth";
 import type { ResponseObject } from "../../types/Response";
 
 export default class Portal {
-    private static readonly BASE_URL = ((import.meta as any).env?.VITE_API_BASE_URL as string | undefined) ?? "http://localhost:3000";
-    private static readonly USER_KEY = ((import.meta as any).env?.VITE_USER_KEY as string | undefined) ?? 'portfolio_cms_auth_user';
+    public static readonly BASE_URL = ((import.meta as any).env?.VITE_API_BASE_URL as string | undefined) ?? "http://localhost:3000";
+    public static readonly USER_KEY = ((import.meta as any).env?.VITE_USER_KEY as string | undefined) ?? 'portfolio_cms_auth_user';
 
     public static async safeJson(res: Response): Promise<any> {
         const text = await res.text();
@@ -12,7 +12,9 @@ export default class Portal {
         try {
             return JSON.parse(text);
         } catch {
-            return { message: text };
+            return {
+                message: text
+            };
         }
     }
 
