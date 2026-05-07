@@ -1,5 +1,6 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
 import AuthPage from './components/AuthPage';
+import AuthCallback from './components/AuthCallback';
 import DashboardPage from './components/DashboardPage';
 import { useAuth } from './hooks/useAuth';
 
@@ -17,6 +18,8 @@ export default function App() {
   return (
     <Routes>
       <Route path="/" element={<Navigate to={user ? '/dashboard' : '/login'} replace />} />
+
+      <Route path="/auth/callback" element={<AuthCallback />} />
 
       <Route
         path="/login"

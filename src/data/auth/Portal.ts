@@ -4,6 +4,7 @@ import type { ResponseObject } from "../../types/Response";
 export default class Portal {
     public static readonly BASE_URL = ((import.meta as any).env?.VITE_API_BASE_URL as string | undefined) ?? "http://localhost:3000";
     public static readonly USER_KEY = ((import.meta as any).env?.VITE_USER_KEY as string | undefined) ?? 'portfolio_cms_auth_user';
+    private static readonly TOKEN_KEY = 'auth_token';
 
     public static async safeJson(res: Response): Promise<any> {
         const text = await res.text();
@@ -18,13 +19,32 @@ export default class Portal {
         }
     }
 
+    private static getAuthHeaders(): HeadersInit {
+        const token = this.getAuthToken();
+        const headers: HeadersInit = {
+            "Content-Type": "application/json"
+        };
+        if (token) {
+            (headers as any)["Authorization"] = `Bearer ${token}`;
+        }
+        return headers;
+    }
+
     private static async post(path: string, payload: unknown): Promise<{ res: Response; body: any }> {
         const res = await fetch(`${Portal.BASE_URL}${path}`, {
-            headers: {
-                "Content-Type": "application/json"
-            },
+            headers: this.getAuthHeaders(),
             method: "POST",
             body: JSON.stringify(payload)
+        });
+
+        const body = await Portal.safeJson(res);
+        return { res, body };
+    }
+
+    private static async get(path: string): Promise<{ res: Response; body: any }> {
+        const res = await fetch(`${Portal.BASE_URL}${path}`, {
+            headers: this.getAuthHeaders(),
+            method: "GET"
         });
 
         const body = await Portal.safeJson(res);
@@ -128,5 +148,62 @@ export default class Portal {
 
     static clearUser(): void {
         localStorage.removeItem(this.USER_KEY);
+    }
+
+    // OAuth Token Management
+    static setAuthToken(token: string): void {
+        localStorage.setItem(this.TOKEN_KEY, token);
+    }
+
+    static getAuthToken(): string | null {
+        try {
+            return localStorage.getItem(this.TOKEN_KEY);
+        } catch {
+            return null;
+        }
+    }
+
+    static clearAuthToken(): void {
+        localStorage.removeItem(this.TOKEN_KEY);
+    }
+
+    // GitHub OAuth Callback Handler
+    static async processOAuthCallback(token: string): Promise<ResponseObject> {
+        try {
+            this.setAuthToken(token);
+
+            // Fetch current user with the token
+            const { res, body } = await this.get("/api/auth/user");
+
+            if (!res.ok) {
+                return {
+                    success: false,
+                    message: body?.message ?? `Failed to fetch user profile (${res.status})`,
+                    error: body,
+                };
+            }
+
+            const user = body?.user ?? body;
+            this.saveUser(user);
+
+            return {
+                success: true,
+                message: "Authentication successful.",
+                user,
+                data: body,
+            };
+        } catch (error) {
+            this.clearAuthToken();
+            return {
+                success: false,
+                message: "An error occurred during OAuth callback.",
+                error
+            };
+        }
+    }
+
+    // GitHub OAuth Start
+    static getGitHubLoginUrl(): string {
+        return `${this.BASE_URL}/api/auth/github`;
     }
 }
