@@ -1,6 +1,6 @@
 # Contribution Guide
 
-Thanks for contributing to Portfolio CMS.
+Thanks for contributing to PortDeck.
 
 ## 1. Prerequisites
 
@@ -58,7 +58,7 @@ Suggested commit style:
 
 ## 6. Data and Storage Rules
 
-- Current persistence uses localStorage key: portfolio_cms_projects.
+- Current persistence uses localStorage key: `portfolio_cms_projects`.
 - Any changes to project schema must include:
   - Type updates
   - UI/form updates

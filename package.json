@@ -1,5 +1,5 @@
 {
-  "name": "project-cms",
+  "name": "portdeck",
   "private": true,
   "version": "1.0.0",
   "type": "module",
@@ -9,8 +9,6 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "test": "vitest",
-    "test:run": "vitest run",
     "preview": "vite preview"
   },
   "license": "MIT",
@@ -22,15 +20,11 @@
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.2.1",
-    "@testing-library/jest-dom": "^6.8.0",
-    "@testing-library/react": "^16.3.0",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^5.1.4",
-    "jsdom": "^26.1.0",
     "tailwindcss": "^4.2.1",
     "typescript": "^5.9.3",
-    "vite": "^7.3.1",
-    "vitest": "^3.2.4"
+    "vite": "^7.3.1"
   }
 }
