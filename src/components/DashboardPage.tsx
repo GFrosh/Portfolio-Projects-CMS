@@ -22,7 +22,7 @@ type ModalMode =
   | { type: 'delete'; projectId: string; title: string };
 
 export default function DashboardPage({ user, signOut }: DashboardPageProps) {
-  const { projects, addProject, updateProject, deleteProject } = useProjects();
+  const { projects, loading, error, addProject, updateProject, deleteProject } = useProjects();
   const [modal, setModal] = useState<ModalMode | null>(null);
   const [search, setSearch] = useState('');
   const [filterStatus, setFilterStatus] = useState<FilterStatus>('all');
@@ -121,13 +121,25 @@ export default function DashboardPage({ user, signOut }: DashboardPageProps) {
           </div>
         </div>
 
-        {projects.length > 0 && (
+        {loading && (
+          <div className="text-center py-12">
+            <p className="text-slate-400">Loading projects...</p>
+          </div>
+        )}
+
+        {error && (
+          <div className="mb-4 p-3 rounded-lg bg-red-500/10 border border-red-500/30 text-red-300 text-sm">
+            {error}
+          </div>
+        )}
+
+        {!loading && projects.length > 0 && (
           <p className="text-xs text-slate-500 mb-4">
             Showing {filtered.length} of {projects.length} project{projects.length !== 1 ? 's' : ''}
           </p>
         )}
 
-        {filtered.length === 0 ? (
+        {!loading && filtered.length === 0 ? (
           <EmptyState
             filtered={projects.length > 0}
             onNewProject={() => setModal({ type: 'create' })}

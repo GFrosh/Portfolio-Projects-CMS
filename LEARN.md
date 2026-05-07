@@ -7,12 +7,14 @@ This guide is a “how it works” companion to the codebase. It’s aimed at he
 
 ## 1) Mental Model: What This App Is (and Isn’t)
 
-This is a **single-user, client-side CMS**:
-- All projects live in React state while the app is running
-- All projects are persisted to **browser localStorage**
-- There is **no backend**, no API, no database, no accounts
+This is a **backend-first portfolio manager**:
+- All projects live on a backend server
+- React state is a **transient cache** of backend data
+- UI updates are optimistic (appear immediately)
+- Changes are synced to the backend in the background
+- Errors are caught and state is reverted if sync fails
 
-If you want multi-device sync or multiple users, you’ll need to replace the storage layer with a real API.
+**Required:** You must implement the REST API backend (`GET/POST/PUT/DELETE /api/projects`).
 
 ---
 
@@ -42,9 +44,18 @@ Storage implementation:
 
 **Important:** there’s no migration/versioning layer for stored data.
 
----
+## 3) Backend API Contract
 
-## 3) UI Orchestration (App.tsx)
+PortDeck expects these endpoints (must be implemented):
+
+- **GET /api/projects** → `Project[]` or `{ projects: Project[] }`
+- **POST /api/projects** → `Project` (request body is full project)
+- **PUT /api/projects/{id}** → `Project` (request body is full project)
+- **DELETE /api/projects/{id}** → `{ success: true }` or similar
+
+Response shapes are flexible (Sheet normalizes common patterns).
+
+---
 
 `src/App.tsx` is the “coordination layer.” It owns:
 

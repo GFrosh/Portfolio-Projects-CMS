@@ -1,8 +1,6 @@
-# Portfolio Projects CMS
+# PortDeck
 
-A lightweight, client-side CMS for managing portfolio projects. Create, edit, view, filter, sort, and delete projects — with persistence handled entirely in the browser via `localStorage`.
-
-**Live site:** https://portfolio-projects-cms.vercel.app
+A lightweight, backend-first portfolio project manager. Create, edit, view, filter, sort, and delete projects with a clean React UI backed by a REST API.
 
 ## Features
 
@@ -13,7 +11,9 @@ A lightweight, client-side CMS for managing portfolio projects. Create, edit, vi
 - Featured projects toggle
 - Modal-driven UI (create/edit/view/delete confirmation)
 - User authentication
-- Data persists in-browser using `localStorage` (no backend)
+- GitHub import integration (fetch repos and auto-fill form)
+- Optimistic UI updates with error recovery
+- All data persists on the backend server
 
 ## Tech Stack
 
@@ -22,7 +22,6 @@ A lightweight, client-side CMS for managing portfolio projects. Create, edit, vi
 - Vite
 - Tailwind CSS
 - UUID v4 for ID generation
-- Vitest for tests
 
 ## Requirements
 
@@ -55,42 +54,42 @@ Preview the production build:
 npm run preview
 ```
 
-Run tests:
 
-```bash
-npm test
-```
 
-Run tests once (CI-style):
+## Backend Requirements
 
-```bash
-npm run test:run
-```
+PortDeck requires a backend API server with the following endpoints:
+
+- `GET /api/projects` – fetch all projects
+- `POST /api/projects` – create a new project
+- `PUT /api/projects/{id}` – update a project
+- `DELETE /api/projects/{id}` – delete a project
+
+The backend base URL is configurable via `VITE_API_BASE_URL` environment variable (defaults to `http://localhost:3000`).
 
 ## Authentication
 
-The app includes one local demo account:
+Auth is handled via the backend Portal service. Update the credentials in the login screen to match your backend.
 
-- User: `user@portfolio.local` / `user123`
+- Default demo: `user@portfolio.local` / `user123`
 
-Auth persistence is local:
+## Architecture
 
-- **Users key:** `portfolio_cms_auth_users`
-- **Session key:** `portfolio_cms_auth_session`
+**Frontend:** React + TypeScript (Vite)
+- Optimistic UI updates (changes appear immediately)
+- Error states with retry guidance
+- Real-time sync with backend
 
-## How Data Persistence Works
+**Backend:** REST API (must be implemented)
+- Store projects in a database
+- Validate and enforce business rules
+- Handle authentication and authorization
 
-Projects are stored in the browser at:
-
-- **Storage:** `window.localStorage`
-- **Key:** `portfolio_cms_projects`
-- **Format:** JSON array of `Project` objects
-
-Implications:
-
-- Data is **per-browser / per-device / per-origin**
-- Clearing site data clears your projects
-- No server-side validation, no sync across devices
+**Data Flow:**
+1. UI dispatches action → React state updated optimistically
+2. Backend call issued in background
+3. On success: Backend returns updated project
+4. On error: UI reverts to previous state and shows error message
 
 ## Data Model
 

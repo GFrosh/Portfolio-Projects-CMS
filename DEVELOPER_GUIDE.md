@@ -1,4 +1,4 @@
-# Portfolio CMS Developer Guide
+# PortDeck Developer Guide
 
 This document explains how the app works internally, from rendering and UI state to persistence and CRUD behavior.
 
@@ -7,7 +7,7 @@ This document explains how the app works internally, from rendering and UI state
 - Frontend framework: React 18 + TypeScript
 - Build tool: Vite
 - Styling: Tailwind CSS
-- Data persistence: Browser localStorage
+- Backend: REST API (must be implemented)
 - ID generation: uuid (v4)
 
 Key scripts in package configuration:
@@ -16,14 +16,14 @@ Key scripts in package configuration:
 - `npm run build`: Runs TypeScript check then production build
 - `npm run preview`: Serves production build locally
 
-## 2. Project Structure Overview
+## 2. Architecture Overview
 
-- `src/main.tsx`: App bootstrap and root render
-- `src/App.tsx`: Main orchestration (toolbar, list, modal routing)
-- `src/hooks/useProjects.ts`: Project state and CRUD functions
-- `src/utils/storage.ts`: localStorage load/save helpers
-- `src/types/project.ts`: Shared domain types
-- `src/components/`: UI components (header, cards, forms, modals, dialogs)
+PortDeck is **backend-first**. The frontend is a thin UI layer that syncs all data with a REST API.
+
+- `src/data/projects/Sheet.ts`: Pure API client (GET, POST, PUT, DELETE)
+- `src/hooks/useProjects.ts`: React state management with optimistic updates + error recovery
+- `src/components/`: UI layer that consumes `useProjects`
+- `src/types/project.ts`: Shared data models
 
 ## 3. Data Model
 
@@ -46,49 +46,69 @@ Fields:
 
 Form payloads use `ProjectFormData`, which is the same shape minus `id`, `createdAt`, and `updatedAt`.
 
-## 4. Storage Layer (Exact Behavior)
+## 4. API Layer (Sheet.ts)
 
-Storage is browser localStorage in `src/utils/storage.ts`.
+The API client is in `src/data/projects/Sheet.ts`.
 
-- Storage key: `portfolio_cms_projects`
-- Write format: `JSON.stringify(projects)`
-- Read format: `JSON.parse(raw)` cast to `Project[]`
-- Corrupted JSON behavior: safely returns empty array
-- Missing key behavior: returns empty array
+Methods:
 
-Important implications:
+- `getProjects()` → `Promise<Project[] | null>`
+  - GET `/api/projects`
+  - Returns all projects or null on error
+  
+- `addProject(project)` → `Promise<Project | null>`
+  - POST `/api/projects`
+  - Returns created project (with id/timestamps set by backend) or null
+  
+- `updateProject(id, project)` → `Promise<Project | null>`
+  - PUT `/api/projects/{id}`
+  - Returns updated project or null
+  
+- `deleteProject(id)` → `Promise<boolean>`
+  - DELETE `/api/projects/{id}`
+  - Returns true on success, false on error
 
-- Data is client-side only (per browser + per device + per origin)
-- No backend/database sync
-- Clearing site data or localStorage removes all projects
-- No multi-user auth or permissions
+All methods:
+- Emit console errors on failure
+- Return null/false (never throw)
+- Expect the backend to handle validation
 
-## 5. State Management and CRUD Flow
+## 5. State Management and CRUD Flow (useProjects)
 
-State is managed with a custom hook: `useProjects`.
+State is managed in `src/hooks/useProjects.ts` with:
 
-Internal flow:
+```typescript
+const [projects, setProjects] = useState<Project[]>([]);
+const [loading, setLoading] = useState(boolean);
+const [error, setError] = useState<string | null>(null);
+```
 
-1. On initial render, projects are loaded from localStorage.
-2. In-memory state is kept in React state (`useState<Project[]>`).
-3. Every mutation calls `persist(updated)`:
-   - updates React state
-   - writes the full array to localStorage
+On mount:
+1. `loading = true` 
+2. Call `Sheet.getProjects()`
+3. If successful: `projects = data`, `error = null`
+4. If failed: `projects = []`, `error = 'Failed to load...'`
+5. `loading = false`
 
-CRUD implementations:
+CRUD pattern (optimistic updates):
 
-- Create (`addProject`)
-  - creates UUID via `uuidv4()`
-  - sets `createdAt` and `updatedAt` to now (ISO)
-  - prepends new item to the list
+**Create:**
+1. Generate UUID and set timestamps locally
+2. Immediately: `projects = [newProject, ...projects]` + clear error
+3. Background: POST to `/api/projects`
+4. On error: revert projects list + set error message
 
-- Update (`updateProject`)
-  - maps existing list
-  - replaces matching project by id
-  - updates `updatedAt`
+**Update:**
+1. Update local state immediately
+2. Background: PUT to `/api/projects/{id}`
+3. On error: revert to previous state + set error message
 
-- Delete (`deleteProject`)
-  - filters out project by id
+**Delete:**
+1. Remove from projects immediately
+2. Background: DELETE `/api/projects/{id}`
+3. On error: restore project + set error message
+
+This pattern keeps the UI responsive while ensuring server sync.
 
 ## 6. App Orchestration in App.tsx
 
