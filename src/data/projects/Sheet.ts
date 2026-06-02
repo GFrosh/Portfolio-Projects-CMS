@@ -97,6 +97,7 @@ export default class Sheet {
 		}
 	}
 
+	
 	// Delete a single project by ID (DELETE). Returns true on success, false on error.
 	static async deleteProject(id: string): Promise<boolean> {
 		try {

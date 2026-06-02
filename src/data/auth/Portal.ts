@@ -175,6 +175,7 @@ export default class Portal {
             // Fetch current user with the token
             const { res, body } = await this.get("/api/auth/user");
 
+            
             if (!res.ok) {
                 return {
                     success: false,
