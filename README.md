@@ -1,146 +1,130 @@
-# PortDeck
+# PortDeck — Next.js edition
 
-A lightweight, backend-first portfolio project manager. Create, edit, view, filter, sort, and delete projects with a clean React UI backed by a REST API.
+A modern rebuild of PortDeck on the **Next.js 15 App Router** with a redesigned
+frontend. Same backend-first REST contract as the original; new design system,
+new layout, new interactions.
 
-## Features
+## What's new vs. the original Vite/React app
 
-- CRUD for portfolio projects (create / edit / view / delete)
-- Search across title, description, and tags
+**Framework**
+
+- Migrated Vite + `react-router-dom` → **Next.js 15 App Router**
+- Real routes: `/`, `/login`, `/signup`, `/auth/callback`, `/dashboard`
+- Client components explicitly marked with `'use client'`; SSR-safe
+  `Portal`/`Sheet` clients (no `localStorage` access on the server)
+- `@/*` path alias for cleaner imports
+- Node ≥ 20.19 (unchanged)
+
+**Design system**
+
+- Palette swap: slate/orange → **ink (deep navy) + iris/violet + emerald** with
+  a soft, layered radial background
+- Typography: Inter (unchanged) + **JetBrains Mono** for endpoints
+- New utility classes: `.glass`, `.glass-strong`, `.text-gradient`,
+  `.shadow-glow`, `.ring-focus`
+- Custom subtle scrollbars & selection color
+
+**Auth screens**
+
+- Split-screen layout with an animated gradient brand panel and marketing copy
+- Segmented Sign In / Sign Up tab now driven by real routes
+- Compact glass card, gradient primary button, GitHub OAuth secondary action
+
+**Dashboard**
+
+- New **hero header** with per-user greeting and four stat pills (Total /
+  Published / Drafts / Featured)
+- **Segmented status filter** (was a `<select>`)
+- New **grid ↔ list view toggle**
+- Cards: hover-lift, cover-image gradient overlay, status dot + pill,
+  hover-revealed actions
+- Reworked endpoints panel with per-card gradient tints and animated copy state
+  (URL / curl)
+- Modals: glassmorphism, scale-in animation, sticky title with optional subtitle
+- Confirm dialog: gradient danger button, keyboard `Esc` to close
+
+**Reliability**
+
+- All localStorage access guarded for SSR
+- Optimistic UI updates preserved; revert-on-failure logic preserved
+- Empty-image graceful fallback via React state (no DOM `display: none`
+  side-effects)
+
+## Preserved features
+
+Full parity with the original:
+
+- CRUD (create / edit / view / delete) with optimistic updates
+- Search across title, description, tags
 - Filter by status: `draft`, `published`, `archived`
-- Sort by `updatedAt`, `createdAt`, or `title` (asc/desc)
-- Featured projects toggle
-- Modal-driven UI (create/edit/view/delete confirmation)
-- User authentication
-- GitHub import integration (fetch repos and auto-fill form)
-- Optimistic UI updates with error recovery
-- All data persists on the backend server
+- Sort by `updatedAt`, `createdAt`, `title` (asc/desc)
+- Featured toggle
+- GitHub import (username → repo list → auto-fill form)
+- Email/password auth + GitHub OAuth callback flow
+- Public API endpoints panel with URL + curl copy actions
 
-## Tech Stack
-
-- React (see `package.json` for exact version)
-- TypeScript
-- Vite
-- Tailwind CSS
-- UUID v4 for ID generation
-
-## Requirements
-
-- Node.js **>= 20.19.0** (per `package.json`)
-- npm
-
-## Getting Started
-
-Install dependencies:
+## Getting started
 
 ```bash
 npm install
-```
-
-Run the dev server:
-
-```bash
+cp .env.example .env.local        # optional
 npm run dev
 ```
 
-Build for production:
+Open <http://localhost:3000>.
 
-```bash
-npm run build
+## Environment
+
+| Variable | Default | Purpose |
+| --- | --- | --- |
+| `NEXT_PUBLIC_API_BASE_URL` | `http://localhost:3000` | Backend REST base |
+| `NEXT_PUBLIC_USER_KEY` | `portdeck_auth_user` | localStorage key for cached user |
+
+## Backend contract (unchanged)
+
+- `GET /api/projects`
+- `POST /api/projects`
+- `PUT /api/projects/edit/{id}`
+- `DELETE /api/projects/delete/{id}`
+- `POST /api/auth/login`
+- `POST /api/auth/signup`
+- `POST /api/auth/logout`
+- `GET /api/auth/user`
+- `GET /api/auth/github` (OAuth start; returns to `/auth/callback?token=…`)
+
+## Project structure
+
 ```
-
-Preview the production build:
-
-```bash
-npm run preview
+src/
+├── app/
+│   ├── layout.tsx           # Root layout, global CSS
+│   ├── page.tsx             # Redirect gate → /login or /dashboard
+│   ├── globals.css          # Tailwind v4 + design tokens
+│   ├── login/page.tsx
+│   ├── signup/page.tsx
+│   ├── auth/callback/page.tsx
+│   └── dashboard/page.tsx
+├── components/
+│   ├── AuthShell.tsx        # Split-screen auth UI
+│   ├── DashboardShell.tsx   # Hero, toolbar, grid/list, modals
+│   ├── EndpointsPanel.tsx
+│   ├── ProjectCard.tsx
+│   ├── ProjectForm.tsx      # incl. GitHub import
+│   ├── ProjectDetail.tsx
+│   ├── Modal.tsx
+│   ├── ConfirmDialog.tsx
+│   ├── EmptyState.tsx
+│   └── icons.tsx
+├── data/
+│   ├── auth/Portal.ts       # SSR-safe REST client
+│   └── projects/Sheet.ts
+├── hooks/
+│   ├── useAuth.ts
+│   └── useProjects.ts
+└── types/
+    ├── auth.ts
+    └── project.ts
 ```
-
-
-
-## Backend Requirements
-
-PortDeck requires a backend API server with the following endpoints:
-
-- `GET /api/projects` – fetch all projects
-- `POST /api/projects` – create a new project
-- `PUT /api/projects/{id}` – update a project
-- `DELETE /api/projects/{id}` – delete a project
-
-The backend base URL is configurable via `VITE_API_BASE_URL` environment variable (defaults to `http://localhost:3000`).
-
-## Authentication
-
-Auth is handled via the backend Portal service. Update the credentials in the login screen to match your backend.
-
-- Default demo: `user@portfolio.local` / `user123`
-
-## Architecture
-
-**Frontend:** React + TypeScript (Vite)
-- Optimistic UI updates (changes appear immediately)
-- Error states with retry guidance
-- Real-time sync with backend
-
-**Backend:** REST API (must be implemented)
-- Store projects in a database
-- Validate and enforce business rules
-- Handle authentication and authorization
-
-**Data Flow:**
-1. UI dispatches action → React state updated optimistically
-2. Backend call issued in background
-3. On success: Backend returns updated project
-4. On error: UI reverts to previous state and shows error message
-
-## Data Model
-
-A `Project` contains:
-
-- `id: string`
-- `title: string`
-- `description: string`
-- `longDescription: string`
-- `tags: string[]`
-- `githubUrl: string`
-- `demoUrl: string`
-- `imageUrl: string`
-- `status: 'draft' | 'published' | 'archived'`
-- `featured: boolean`
-- `createdAt: string` (ISO)
-- `updatedAt: string` (ISO)
-
-Forms use `ProjectFormData` (same shape minus `id`, `createdAt`, `updatedAt`).
-
-## Project Structure (high-level)
-
-- `src/main.tsx` – app bootstrap
-- `src/App.tsx` – auth gate, toolbar state, filtering/sorting, modal routing
-- `src/hooks/useAuth.ts` – auth state + sign-in/sign-out flows
-- `src/data/auth/repository.ts` – auth repository (current local adapter)
-- `src/hooks/useProjects.ts` – project state + CRUD + repository calls
-- `src/data/projects/repository.ts` – project repository contract
-- `src/data/projects/localProjectRepository.ts` – local project adapter
-- `src/types/project.ts` – domain types
-- `src/types/auth.ts` – auth domain types
-- `src/components/` – UI components (cards, forms, modals, etc.)
-
-## DB Integration Path
-
-The app now uses repository contracts for both projects and auth.
-
-To integrate a database, add new adapters (for example API-backed repositories) that implement:
-
-- `AuthRepository` in `src/types/auth.ts`
-- `ProjectRepository` in `src/data/projects/repository.ts`
-
-Then switch the exported repository instance to the DB-backed implementation.
-
-## Contributing / Extending
-
-If you add new fields to `Project`:
-1. Update `src/types/project.ts`
-2. Update form defaults + inputs in `ProjectForm`
-3. Update UI surfaces (`ProjectCard`, `ProjectDetail`, etc.)
-4. Consider backward compatibility for previously saved `localStorage` data
 
 ## License
 

@@ -1,3 +1,7 @@
+'use client';
+
+import { PlusIcon, ImageIcon } from './icons';
+
 interface EmptyStateProps {
   filtered: boolean;
   onNewProject: () => void;
@@ -5,29 +9,36 @@ interface EmptyStateProps {
 
 export default function EmptyState({ filtered, onNewProject }: EmptyStateProps) {
   return (
-    <div className="flex flex-col items-center justify-center py-24 text-center">
-      <div className="flex items-center justify-center w-16 h-16 rounded-2xl bg-slate-800 mb-4">
-        <svg className="w-8 h-8 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12.75V12A2.25 2.25 0 014.5 9.75h15A2.25 2.25 0 0121.75 12v.75m-8.69-6.44l-2.12-2.12a1.5 1.5 0 00-1.061-.44H4.5A2.25 2.25 0 002.25 6v12a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9a2.25 2.25 0 00-2.25-2.25h-5.379a1.5 1.5 0 01-1.06-.44z" />
-        </svg>
+    <div className="glass rounded-3xl flex flex-col items-center justify-center py-20 px-6 text-center">
+      <div className="relative flex items-center justify-center w-20 h-20 rounded-3xl bg-gradient-to-br from-iris-500/15 to-violet-accent/15 border border-white/10 mb-5">
+        <ImageIcon className="w-10 h-10 text-ink-400" />
+        <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-mint-500 shadow-lg shadow-mint-500/40" />
       </div>
       {filtered ? (
         <>
-          <h3 className="text-base font-semibold text-white mb-1">No projects match</h3>
-          <p className="text-sm text-slate-400">Try adjusting your search or filter criteria.</p>
+          <h3 className="text-lg font-semibold text-white mb-1">
+            No projects match
+          </h3>
+          <p className="text-sm text-ink-400 max-w-sm">
+            Try adjusting your search or filter criteria to find what you&apos;re
+            looking for.
+          </p>
         </>
       ) : (
         <>
-          <h3 className="text-base font-semibold text-white mb-1">No projects yet</h3>
-          <p className="text-sm text-slate-400 mb-5">Get started by adding your first portfolio project.</p>
+          <h3 className="text-lg font-semibold text-white mb-1">
+            Start your deck
+          </h3>
+          <p className="text-sm text-ink-400 mb-6 max-w-sm">
+            Add your first portfolio project — import from GitHub or start from a
+            blank slate.
+          </p>
           <button
             onClick={onNewProject}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-brand-600 hover:bg-brand-500 text-white text-sm font-medium transition-colors"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-iris-500 to-violet-accent text-white text-sm font-semibold shadow-glow hover:brightness-110 transition-all"
           >
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-            </svg>
-            Add Project
+            <PlusIcon className="w-4 h-4" />
+            Add your first project
           </button>
         </>
       )}

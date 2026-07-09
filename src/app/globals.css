@@ -1,0 +1,155 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+
+@import 'tailwindcss';
+
+@theme {
+  /* Fresh, redesigned palette: indigo→violet primary with emerald accents,
+     on a soft "ink" dark background. Very different from the original
+     slate/orange combination. */
+  --color-ink-50: #f7f7fb;
+  --color-ink-100: #edeef5;
+  --color-ink-200: #d6d9e6;
+  --color-ink-300: #a9aec7;
+  --color-ink-400: #7d84a3;
+  --color-ink-500: #575d7d;
+  --color-ink-600: #3d4362;
+  --color-ink-700: #2a2f4a;
+  --color-ink-800: #1a1e33;
+  --color-ink-900: #10132a;
+  --color-ink-950: #080a1c;
+
+  --color-iris-50: #eef1ff;
+  --color-iris-100: #dee4ff;
+  --color-iris-200: #becaff;
+  --color-iris-300: #93a4ff;
+  --color-iris-400: #6b7cff;
+  --color-iris-500: #4a58f5;
+  --color-iris-600: #3a3ed6;
+  --color-iris-700: #2f31a8;
+  --color-iris-800: #262885;
+  --color-iris-900: #1c1e68;
+
+  --color-violet-accent: #a855f7;
+  --color-mint-400: #34d399;
+  --color-mint-500: #10b981;
+  --color-amber-soft: #fbbf24;
+  --color-rose-soft: #fb7185;
+
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
+
+  --shadow-glow: 0 0 40px -10px rgba(74, 88, 245, 0.4);
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px -8px rgba(0, 0, 0, 0.4);
+}
+
+@layer base {
+  html, body {
+    height: 100%;
+  }
+
+  body {
+    @apply text-ink-100 antialiased;
+    font-family: var(--font-sans);
+    background-color: var(--color-ink-950);
+    background-image:
+      radial-gradient(ellipse 80% 50% at 20% -10%, rgba(74, 88, 245, 0.25), transparent 55%),
+      radial-gradient(ellipse 60% 50% at 90% 10%, rgba(168, 85, 247, 0.18), transparent 55%),
+      radial-gradient(ellipse 70% 50% at 50% 110%, rgba(16, 185, 129, 0.10), transparent 60%);
+    background-attachment: fixed;
+  }
+
+  ::selection {
+    background: rgba(74, 88, 245, 0.45);
+    color: white;
+  }
+}
+
+@utility glass {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.04),
+    rgba(255, 255, 255, 0.01) 60%
+  );
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+@utility glass-strong {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.07),
+    rgba(255, 255, 255, 0.02) 60%
+  );
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+@utility ring-focus {
+  outline: none;
+  box-shadow:
+    0 0 0 1px var(--color-iris-500),
+    0 0 0 4px rgba(74, 88, 245, 0.15);
+}
+
+@utility scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-ink-700) transparent;
+}
+
+/* Custom scrollbar for WebKit */
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+*::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+*::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.16);
+  background-clip: padding-box;
+}
+
+/* Animations */
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes scale-in {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.animate-fade-in { animation: fade-in 0.3s ease-out; }
+.animate-scale-in { animation: scale-in 0.2s ease-out; }
+
+.text-gradient {
+  background: linear-gradient(135deg, #a5b4fc 0%, #c084fc 50%, #34d399 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+.line-clamp-1 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+}
+.line-clamp-2 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}

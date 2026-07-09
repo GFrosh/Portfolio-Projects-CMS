@@ -1,5 +1,11 @@
-node_modules
-dist/
+node_modules/
+.next/
+out/
 build/
-coverage
+dist/
 .env
+.env.local
+.DS_Store
+*.log
+.vscode/
+.idea/
