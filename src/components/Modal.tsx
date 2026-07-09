@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 import { CloseIcon } from './icons';
+import styles from './PortDeck.module.css';
 
 interface ModalProps {
   title: string;
@@ -34,40 +35,41 @@ export default function Modal({
   }, [onClose]);
 
   const sizeClass = {
-    md: 'max-w-md',
-    lg: 'max-w-2xl',
-    xl: 'max-w-4xl',
+    md: '28rem',
+    lg: '42rem',
+    xl: '56rem',
   }[size];
 
   return (
     <div
       ref={overlayRef}
-      className="fixed inset-0 z-50 flex items-start justify-center bg-black/60 backdrop-blur-md overflow-y-auto py-8 px-4 animate-fade-in"
+      className={`${styles.modalOverlay} ${styles.glass}`}
       onClick={(e) => {
         if (e.target === overlayRef.current) onClose();
       }}
     >
       <div
-        className={`relative w-full ${sizeClass} glass-strong rounded-3xl shadow-card animate-scale-in`}
+        className={`${styles.modalPanel} ${styles.glassStrong} ${styles.shadowCard}`}
+        style={{ maxWidth: sizeClass }}
       >
-        <div className="flex items-start justify-between gap-4 px-6 pt-5 pb-4 border-b border-white/8">
-          <div className="min-w-0">
-            <h2 className="text-lg font-semibold text-white tracking-tight truncate">
+        <div className={styles.modalHeader}>
+          <div style={{ minWidth: 0 }}>
+            <h2 className={styles.modalTitle}>
               {title}
             </h2>
             {subtitle && (
-              <p className="text-xs text-ink-400 mt-0.5">{subtitle}</p>
+              <p className={styles.modalSubtitle}>{subtitle}</p>
             )}
           </div>
           <button
             onClick={onClose}
-            className="shrink-0 p-1.5 rounded-lg text-ink-400 hover:text-white hover:bg-white/10 transition-colors"
+            className={styles.modalCloseButton}
             aria-label="Close"
           >
             <CloseIcon className="w-4 h-4" />
           </button>
         </div>
-        <div className="px-6 py-5">{children}</div>
+        <div className={styles.modalBody}>{children}</div>
       </div>
     </div>
   );

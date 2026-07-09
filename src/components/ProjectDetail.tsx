@@ -9,6 +9,7 @@ import {
   StarIcon,
   ImageIcon,
 } from './icons';
+import styles from './PortDeck.module.css';
 
 interface ProjectDetailProps {
   project: Project;
@@ -36,19 +37,19 @@ export default function ProjectDetail({ project, onEdit }: ProjectDetailProps) {
   });
 
   return (
-    <div className="space-y-6">
+    <div className={styles.detailShell}>
       {/* Cover */}
-      <div className="relative rounded-2xl overflow-hidden h-56 bg-gradient-to-br from-iris-500/20 via-violet-accent/10 to-mint-500/10 -mx-1">
+      <div className={styles.detailCover}>
         {project.imageUrl && !imgError ? (
           <>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={project.imageUrl}
               alt={project.title}
-              className="w-full h-full object-cover"
+              className={styles.detailImage}
               onError={() => setImgError(true)}
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-ink-950/60 to-transparent" />
+            <div className={styles.detailOverlay} />
           </>
         ) : (
           <div className="flex items-center justify-center w-full h-full">
@@ -58,24 +59,24 @@ export default function ProjectDetail({ project, onEdit }: ProjectDetailProps) {
       </div>
 
       {/* Header */}
-      <div className="flex items-start justify-between gap-4 flex-wrap">
+      <div className={styles.detailHeader}>
         <div>
-          <h2 className="text-2xl font-semibold text-white tracking-tight">
+          <h2 className={styles.detailTitle}>
             {project.title}
           </h2>
-          <p className="text-xs text-ink-500 mt-1">
+          <p className={styles.detailMeta}>
             Created {created} · Updated {updated}
           </p>
         </div>
         <div className="flex items-center gap-2">
           {project.featured && (
-            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-gradient-to-r from-iris-500/25 to-violet-accent/25 text-iris-200 text-xs font-semibold ring-1 ring-inset ring-iris-400/30">
+            <span className={styles.projectCardFeatured}>
               <StarIcon className="w-3 h-3" />
               Featured
             </span>
           )}
           <span
-            className={`px-2.5 py-1 rounded-lg text-xs font-medium ${STATUS_STYLES[project.status]}`}
+            className={`${styles.projectCardStatus} ${STATUS_STYLES[project.status]}`}
           >
             {project.status.charAt(0).toUpperCase() + project.status.slice(1)}
           </span>
@@ -83,17 +84,17 @@ export default function ProjectDetail({ project, onEdit }: ProjectDetailProps) {
       </div>
 
       {/* Short description */}
-      <p className="text-sm text-ink-200 leading-relaxed">
+      <p className={styles.detailText}>
         {project.description}
       </p>
 
       {/* Long description */}
       {project.longDescription && (
-        <div className="rounded-2xl border border-white/8 bg-white/[0.02] p-4">
-          <p className="text-[11px] uppercase tracking-[0.18em] text-ink-500 mb-2">
+        <div className={styles.detailPanel}>
+          <p className={styles.detailPanelTitle}>
             About this project
           </p>
-          <p className="text-sm text-ink-300 leading-relaxed whitespace-pre-wrap">
+          <p className={styles.detailText} style={{ whiteSpace: 'pre-wrap', color: 'var(--color-ink-300)' }}>
             {project.longDescription}
           </p>
         </div>
@@ -102,14 +103,14 @@ export default function ProjectDetail({ project, onEdit }: ProjectDetailProps) {
       {/* Tags */}
       {project.tags.length > 0 && (
         <div>
-          <p className="text-[11px] uppercase tracking-[0.18em] text-ink-500 mb-2">
+          <p className={styles.detailTagsTitle}>
             Tech stack
           </p>
-          <div className="flex flex-wrap gap-1.5">
+          <div className={styles.detailTags}>
             {project.tags.map((tag) => (
               <span
                 key={tag}
-                className="px-2.5 py-1 rounded-lg bg-white/[0.05] border border-white/8 text-ink-200 text-xs font-medium"
+                className={styles.tagChipMuted}
               >
                 {tag}
               </span>
@@ -120,13 +121,13 @@ export default function ProjectDetail({ project, onEdit }: ProjectDetailProps) {
 
       {/* Links */}
       {(project.githubUrl || project.demoUrl) && (
-        <div className="flex items-center gap-2 flex-wrap">
+        <div className={styles.detailActions}>
           {project.githubUrl && (
             <a
               href={project.githubUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white/[0.05] border border-white/8 hover:bg-white/[0.08] text-ink-100 text-sm font-medium transition-colors"
+              className={`${styles.buttonSecondary} ${styles.detailActionButton}`}
             >
               <GitHubIcon className="w-4 h-4" />
               View source
@@ -137,7 +138,7 @@ export default function ProjectDetail({ project, onEdit }: ProjectDetailProps) {
               href={project.demoUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-iris-500 to-violet-accent text-white text-sm font-semibold shadow-glow hover:brightness-110 transition-all"
+              className={`${styles.buttonPrimary} ${styles.detailActionButton}`}
             >
               <ExternalIcon className="w-4 h-4" />
               Live demo
@@ -146,10 +147,10 @@ export default function ProjectDetail({ project, onEdit }: ProjectDetailProps) {
         </div>
       )}
 
-      <div className="flex justify-end pt-3 border-t border-white/8">
+      <div className={styles.detailFooter}>
         <button
           onClick={onEdit}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white/[0.05] border border-white/8 hover:bg-white/[0.08] text-ink-100 text-sm font-medium transition-colors"
+          className={`${styles.buttonSecondary} ${styles.detailActionButton}`}
         >
           <EditIcon className="w-4 h-4" />
           Edit project

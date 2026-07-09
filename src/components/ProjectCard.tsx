@@ -10,6 +10,7 @@ import {
   StarIcon,
   ImageIcon,
 } from './icons';
+import styles from './PortDeck.module.css';
 
 const STATUS_STYLES: Record<Project['status'], string> = {
   published:
@@ -51,12 +52,12 @@ export default function ProjectCard({
   });
 
   return (
-    <article className="group relative flex flex-col rounded-2xl overflow-hidden glass hover:border-white/20 hover:shadow-card transition-all duration-300 hover:-translate-y-0.5">
+    <article className={`${styles.projectCard} ${styles.glass} ${styles.shadowCard}`}>
       {/* Thumbnail */}
       <button
         type="button"
         onClick={() => onView(project)}
-        className="relative h-40 bg-gradient-to-br from-iris-500/20 via-violet-accent/10 to-mint-500/10 overflow-hidden text-left focus:outline-none"
+        className={styles.projectCardThumb}
         aria-label={`View ${project.title}`}
       >
         {project.imageUrl && !imgError ? (
@@ -65,10 +66,10 @@ export default function ProjectCard({
             <img
               src={project.imageUrl}
               alt={project.title}
-              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.06]"
+              className={styles.projectCardImage}
               onError={() => setImgError(true)}
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-ink-950/70 via-ink-950/10 to-transparent" />
+            <div className={styles.projectCardOverlay} />
           </>
         ) : (
           <div className="flex items-center justify-center w-full h-full">
@@ -83,7 +84,7 @@ export default function ProjectCard({
 
         {/* Featured badge */}
         {project.featured && (
-          <span className="absolute top-2.5 left-2.5 inline-flex items-center gap-1 rounded-full bg-gradient-to-r from-iris-500 to-violet-accent px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-white shadow-lg shadow-iris-900/30">
+          <span className={styles.projectCardFeatured}>
             <StarIcon className="w-3 h-3" />
             Featured
           </span>
@@ -91,7 +92,7 @@ export default function ProjectCard({
 
         {/* Status pill */}
         <span
-          className={`absolute top-2.5 right-2.5 inline-flex items-center gap-1.5 rounded-full backdrop-blur-sm px-2 py-0.5 text-[10px] font-medium ${STATUS_STYLES[project.status]}`}
+          className={`${styles.projectCardStatus} ${STATUS_STYLES[project.status]}`}
         >
           <span className={`h-1.5 w-1.5 rounded-full ${STATUS_DOT[project.status]}`} />
           {STATUS_LABEL[project.status]}
@@ -99,32 +100,32 @@ export default function ProjectCard({
       </button>
 
       {/* Content */}
-      <div className="flex flex-col flex-1 p-4 gap-3">
+      <div className={styles.projectCardContent}>
         <div>
           <h3
-            className="text-sm font-semibold text-white leading-snug cursor-pointer hover:text-iris-300 transition-colors line-clamp-1"
+            className={`${styles.projectCardTitle} ${styles.lineClamp1}`}
             onClick={() => onView(project)}
           >
             {project.title || 'Untitled project'}
           </h3>
-          <p className="text-xs text-ink-400 mt-1 line-clamp-2 leading-relaxed min-h-[2.4em]">
+          <p className={`${styles.projectCardDescription} ${styles.lineClamp2}`}>
             {project.description || 'No description yet.'}
           </p>
         </div>
 
         {/* Tags */}
         {project.tags.length > 0 && (
-          <div className="flex flex-wrap gap-1">
+          <div className={styles.projectCardTags}>
             {project.tags.slice(0, 4).map((tag) => (
               <span
                 key={tag}
-                className="px-2 py-0.5 rounded-md bg-white/[0.05] border border-white/5 text-ink-200 text-[10px] font-medium"
+                className={styles.tagChipMuted}
               >
                 {tag}
               </span>
             ))}
             {project.tags.length > 4 && (
-              <span className="px-2 py-0.5 rounded-md bg-white/[0.05] text-ink-400 text-[10px]">
+              <span className={styles.tagChipMuted}>
                 +{project.tags.length - 4}
               </span>
             )}
@@ -132,15 +133,15 @@ export default function ProjectCard({
         )}
 
         {/* Footer */}
-        <div className="flex items-center justify-between mt-auto pt-3 border-t border-white/8">
-          <span className="text-[11px] text-ink-500">Updated {updatedDate}</span>
-          <div className="flex items-center gap-0.5">
+        <div className={styles.projectCardFooter}>
+          <span className={styles.projectCardMeta}>Updated {updatedDate}</span>
+          <div className={styles.projectCardLinks}>
             {project.githubUrl && (
               <a
                 href={project.githubUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="p-1.5 rounded-lg text-ink-400 hover:text-white hover:bg-white/10 transition-colors"
+                className={styles.projectCardLink}
                 title="GitHub"
                 onClick={(e) => e.stopPropagation()}
               >
@@ -152,7 +153,7 @@ export default function ProjectCard({
                 href={project.demoUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="p-1.5 rounded-lg text-ink-400 hover:text-white hover:bg-white/10 transition-colors"
+                className={styles.projectCardLink}
                 title="Live demo"
                 onClick={(e) => e.stopPropagation()}
               >
@@ -161,14 +162,14 @@ export default function ProjectCard({
             )}
             <button
               onClick={() => onEdit(project)}
-              className="p-1.5 rounded-lg text-ink-400 hover:text-white hover:bg-white/10 transition-colors"
+              className={styles.projectCardLink}
               title="Edit"
             >
               <EditIcon className="w-3.5 h-3.5" />
             </button>
             <button
               onClick={() => onDelete(project.id)}
-              className="p-1.5 rounded-lg text-ink-400 hover:text-rose-soft hover:bg-rose-500/10 transition-colors"
+              className={`${styles.projectCardLink} ${styles.projectCardLinkDanger}`}
               title="Delete"
             >
               <TrashIcon className="w-3.5 h-3.5" />

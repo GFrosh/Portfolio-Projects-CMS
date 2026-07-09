@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 import DashboardShell from '@/components/DashboardShell';
+import styles from '@/components/PortDeck.module.css';
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -15,10 +16,10 @@ export default function DashboardPage() {
 
   if (!isReady || !user) {
     return (
-      <main className="min-h-screen flex items-center justify-center">
-        <div className="flex flex-col items-center gap-4">
-          <div className="w-10 h-10 rounded-full border-2 border-ink-700 border-t-iris-400 animate-spin" />
-          <p className="text-ink-300 text-sm">Loading dashboard…</p>
+      <main className={styles.loaderScreen}>
+        <div className={styles.loaderStack}>
+          <div className={styles.loaderSpinner} />
+          <p className={styles.loaderText}>Loading dashboard…</p>
         </div>
       </main>
     );

@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import type { AuthUser } from '@/types/auth';
 import Portal from '@/data/auth/Portal';
 import { CheckIcon, CopyIcon } from './icons';
+import styles from './PortDeck.module.css';
 
 interface EndpointsPanelProps {
   user: AuthUser;
@@ -66,43 +67,44 @@ export default function EndpointsPanel({ user }: EndpointsPanelProps) {
   };
 
   return (
-    <section className="glass rounded-3xl p-5 sm:p-6">
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between mb-5">
+    <section className={`${styles.endpointsSection} ${styles.glass}`}>
+      <div className={styles.endpointsHeader}>
         <div>
-          <h2 className="text-lg font-semibold text-white tracking-tight">
+          <h2 className={styles.endpointsHeading}>
             Export & endpoints
           </h2>
-          <p className="text-sm text-ink-400 max-w-2xl mt-0.5">
+          <p className={styles.endpointsCopy}>
             Wire your public portfolio site to these ready-to-use REST endpoints.
           </p>
         </div>
-        <span className="text-[10px] uppercase tracking-widest text-ink-500">
+        <span className={styles.endpointsEyebrow}>
           Copy-paste friendly
         </span>
       </div>
 
-      <div className="grid grid-cols-1 gap-3 lg:grid-cols-3">
+      <div className={styles.endpointsGrid}>
         {endpoints.map((ep) => (
           <article
             key={ep.key}
-            className={`relative overflow-hidden rounded-2xl border border-white/8 bg-gradient-to-br ${ep.tint} p-4 flex flex-col gap-3`}
+            className={`${styles.endpointCard} ${styles.glassStrong}`}
+            style={{ background: `linear-gradient(135deg, var(--color-ink-900), var(--color-ink-950))` }}
           >
             <div>
-              <p className="text-[11px] uppercase tracking-[0.18em] text-ink-300">
+              <p className={styles.endpointSub}>
                 {ep.subtitle}
               </p>
-              <p className="mt-0.5 text-sm font-semibold text-white">
+              <p className={styles.endpointTitle}>
                 {ep.title}
               </p>
-              <p className="mt-2 text-xs font-mono text-ink-200 break-all leading-5">
+              <p className={styles.endpointUrl}>
                 {ep.url}
               </p>
             </div>
 
-            <div className="flex gap-2 mt-auto">
+            <div className={styles.endpointActions}>
               <button
                 onClick={() => handleCopy(ep.url, `${ep.key}-url`)}
-                className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-lg bg-white/10 hover:bg-white/15 border border-white/10 px-3 py-1.5 text-xs font-medium text-white transition-colors"
+                className={styles.endpointButton}
               >
                 {copiedKey === `${ep.key}-url` ? (
                   <>
@@ -118,7 +120,7 @@ export default function EndpointsPanel({ user }: EndpointsPanelProps) {
               </button>
               <button
                 onClick={() => handleCopy(ep.curl, `${ep.key}-curl`)}
-                className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-lg bg-black/30 hover:bg-black/40 border border-white/10 px-3 py-1.5 text-xs font-medium text-ink-100 transition-colors"
+                className={`${styles.endpointButton} ${styles.endpointButtonAlt}`}
               >
                 {copiedKey === `${ep.key}-curl` ? (
                   <>
@@ -134,7 +136,7 @@ export default function EndpointsPanel({ user }: EndpointsPanelProps) {
               </button>
             </div>
 
-            <pre className="mt-1 overflow-x-auto scrollbar-thin rounded-lg bg-black/30 border border-white/8 p-2.5 text-[11px] font-mono text-ink-300 leading-5 whitespace-pre-wrap break-words">
+            <pre className={styles.endpointCode}>
               {ep.curl}
             </pre>
           </article>

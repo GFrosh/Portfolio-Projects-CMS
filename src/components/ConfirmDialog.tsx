@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import { AlertIcon } from './icons';
+import styles from './PortDeck.module.css';
 
 interface ConfirmDialogProps {
   title: string;
@@ -27,29 +28,29 @@ export default function ConfirmDialog({
   }, [onCancel]);
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-md px-4 animate-fade-in">
-      <div className="w-full max-w-sm glass-strong rounded-3xl shadow-card p-6 space-y-5 animate-scale-in">
+    <div className={styles.confirmOverlay}>
+      <div className={`${styles.confirmPanel} ${styles.glassStrong} ${styles.shadowCard}`}>
         <div className="flex items-start gap-4">
-          <div className="flex items-center justify-center w-11 h-11 rounded-2xl bg-rose-500/15 ring-1 ring-rose-500/25 shrink-0">
+          <div className={styles.confirmIconWrap}>
             <AlertIcon className="w-5 h-5 text-rose-soft" />
           </div>
           <div>
-            <h3 className="text-base font-semibold text-white">{title}</h3>
-            <p className="text-sm text-ink-300 mt-1 leading-relaxed">
+            <h3 className={styles.confirmTitle}>{title}</h3>
+            <p className={styles.confirmMessage}>
               {message}
             </p>
           </div>
         </div>
-        <div className="flex justify-end gap-2">
+        <div className={styles.confirmActions}>
           <button
             onClick={onCancel}
-            className="px-4 py-2 rounded-xl text-sm font-medium text-ink-200 hover:text-white hover:bg-white/8 transition-colors"
+            className={styles.buttonSecondary}
           >
             Cancel
           </button>
           <button
             onClick={onConfirm}
-            className="px-4 py-2 rounded-xl bg-gradient-to-r from-rose-500 to-rose-600 text-white text-sm font-semibold shadow-lg shadow-rose-900/30 hover:brightness-110 transition-all"
+            className={styles.buttonDanger}
           >
             {confirmLabel}
           </button>

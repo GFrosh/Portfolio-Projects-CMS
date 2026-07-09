@@ -4,6 +4,7 @@ import { Suspense, useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Portal from '@/data/auth/Portal';
+import styles from '@/components/PortDeck.module.css';
 
 function CallbackInner() {
   const searchParams = useSearchParams();
@@ -48,22 +49,33 @@ function CallbackInner() {
   }, [searchParams, router]);
 
   return (
-    <main className="min-h-screen flex items-center justify-center p-4">
-      <section className="w-full max-w-md glass-strong rounded-3xl p-6 sm:p-8 shadow-card animate-scale-in">
+    <main className={styles.loaderScreen}>
+      <section className={`${styles.glassStrong} ${styles.shadowCard} ${styles.modalPanel}`}>
         {status === 'loading' && (
-          <div className="flex flex-col items-center gap-4">
-            <div className="w-12 h-12 border-2 border-ink-700 border-t-iris-400 rounded-full animate-spin" />
-            <p className="text-ink-200 text-center text-sm">
+          <div className={styles.loaderStack}>
+            <div className={styles.loaderSpinner} />
+            <p style={{ color: 'var(--color-ink-200)', textAlign: 'center', fontSize: '0.875rem' }}>
               Processing your GitHub sign-in…
             </p>
           </div>
         )}
 
         {status === 'success' && (
-          <div className="flex flex-col items-center gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-mint-500/15 border border-mint-500/30 flex items-center justify-center">
+          <div className={styles.loaderStack}>
+            <div
+              style={{
+                width: '3.5rem',
+                height: '3.5rem',
+                borderRadius: '1rem',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                background: 'rgba(16, 185, 129, 0.15)',
+                border: '1px solid rgba(16, 185, 129, 0.3)',
+              }}
+            >
               <svg
-                className="w-6 h-6 text-mint-400"
+                style={{ width: '1.5rem', height: '1.5rem', color: 'var(--color-mint-400)' }}
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -76,17 +88,28 @@ function CallbackInner() {
                 />
               </svg>
             </div>
-            <p className="text-ink-200 text-center text-sm">
+            <p style={{ color: 'var(--color-ink-200)', textAlign: 'center', fontSize: '0.875rem' }}>
               Successfully signed in! Redirecting…
             </p>
           </div>
         )}
 
         {status === 'error' && (
-          <div className="flex flex-col items-center gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-rose-500/10 border border-rose-500/30 flex items-center justify-center">
+          <div className={styles.loaderStack}>
+            <div
+              style={{
+                width: '3.5rem',
+                height: '3.5rem',
+                borderRadius: '1rem',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                background: 'rgba(244, 63, 94, 0.1)',
+                border: '1px solid rgba(244, 63, 94, 0.3)',
+              }}
+            >
               <svg
-                className="w-6 h-6 text-rose-soft"
+                style={{ width: '1.5rem', height: '1.5rem', color: 'var(--color-rose-soft)' }}
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -99,12 +122,12 @@ function CallbackInner() {
                 />
               </svg>
             </div>
-            <p className="text-ink-200 text-center font-medium">
+            <p style={{ color: 'var(--color-ink-200)', textAlign: 'center', fontWeight: 500 }}>
               {errorMessage}
             </p>
             <Link
               href="/login"
-              className="mt-2 inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-iris-500 to-violet-accent text-white text-sm font-medium shadow-glow hover:brightness-110 transition-all"
+              className={styles.buttonPrimary}
             >
               Return to Sign In
             </Link>
@@ -119,8 +142,8 @@ export default function AuthCallbackPage() {
   return (
     <Suspense
       fallback={
-        <main className="min-h-screen flex items-center justify-center">
-          <div className="w-10 h-10 rounded-full border-2 border-ink-700 border-t-iris-400 animate-spin" />
+        <main className={styles.loaderScreen}>
+          <div className={styles.loaderSpinner} />
         </main>
       }
     >
