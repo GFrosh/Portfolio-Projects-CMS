@@ -1,4 +1,12 @@
 import type { NextConfig } from 'next';
+import { ensureVariables } from '@/lib/env';
+import { initialiseDatabase } from '@/lib/db';
+
+
+(async () => {
+  ensureVariables();
+  await initialiseDatabase();
+})();
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
