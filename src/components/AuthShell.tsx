@@ -6,8 +6,9 @@ import { useEffect, useState, type SubmitEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import styles from './PortDeck.module.css';
-import { signIn, signUp } from '@/utils/auth';
-import { auth } from '@/app/auth';
+import { signUp } from '@/utils/auth';
+import { signIn } from '@/app/auth';
+import { useSession } from 'next-auth/react';
 
 
 interface AuthShellProps {
@@ -17,7 +18,7 @@ interface AuthShellProps {
 
 export default function AuthShell({ mode }: AuthShellProps) {
 	const router = useRouter();
-	const [user, setUser] = useState(null);
+	const { data: session, status } = useSession();
 	const [name, setName] = useState('');
 	const [email, setEmail] = useState('user@portdeck.local');
 	const [password, setPassword] = useState('password123');
@@ -25,20 +26,18 @@ export default function AuthShell({ mode }: AuthShellProps) {
 	const [isAuthenticating, setIsAuthenticating] = useState(false);
 
 	useEffect(() => {
-		async function fetchUser() {
-			const session = await auth();
-			if (session) setUser(session);
-			else setUser(null);
+		setIsAuthenticating(true);
+		if (status === 'authenticated' && session?.user) {
+			router.replace('/dashboard');
 		}
-		fetchUser();
-		if (user) router.replace('/dashboard');
-	}, [user, router]);
+		setIsAuthenticating(false);
+	}, [status, session, router]);
 
 	const handleSubmit = async (e: SubmitEvent<HTMLFormElement>) => {
 		e.preventDefault();
 		const ok = mode === 'signup'
 			? await signUp({ name, email, password })
-			: await signIn({ email, password });
+			: await signIn("github", { callbackUrl: `${window.location.origin}/dashboard` });
 		if (ok) router.replace('/dashboard');
 	};
 
@@ -178,7 +177,7 @@ export default function AuthShell({ mode }: AuthShellProps) {
 				</div>
 
 				<a 
-					href="/api/auth/github"
+					href="/api/auth/callback/github"
 					className={`${styles.buttonSecondary} ${styles.authSocialButton}`}>
 					<GitHubIcon />
 					GitHub

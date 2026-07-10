@@ -2,7 +2,6 @@ import env from '@/lib/env';
 
 
 export async function signIn({ email, password }: { email: string; password: string }) {
-	"use server";
 	const res = await fetch(`${env.baseUrl}/api/auth/login`, {
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
@@ -15,7 +14,6 @@ export async function signIn({ email, password }: { email: string; password: str
 }
 
 export async function signUp({ name, email, password }: { name: string; email: string; password: string }) {
-	"use server";
 	const res = await fetch(`${env.baseUrl}/api/auth/signup`, {
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
@@ -28,7 +26,6 @@ export async function signUp({ name, email, password }: { name: string; email: s
 }
 
 export async function signOut() {
-	"use server";
 	const res = await fetch(`${env.baseUrl}/api/auth/logout`, {
 		method: 'POST',
 	});
@@ -36,4 +33,4 @@ export async function signOut() {
 		throw new Error('Failed to sign out');
 	}
 	return true;
-}	
+}

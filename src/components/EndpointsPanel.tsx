@@ -1,13 +1,12 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
-import type { AuthUser } from '@/types/auth';
-import Portal from '@/data/auth/Portal';
+import env from "@/lib/env";
 import { CheckIcon, CopyIcon } from './icons';
 import styles from './PortDeck.module.css';
 
 interface EndpointsPanelProps {
-  user: AuthUser;
+  user: any;
 }
 
 export default function EndpointsPanel({ user }: EndpointsPanelProps) {
@@ -22,7 +21,7 @@ export default function EndpointsPanel({ user }: EndpointsPanelProps) {
   );
 
   const endpoints = useMemo(() => {
-    const base = Portal.BASE_URL.replace(/\/$/, '');
+    const base = env.baseUrl.replace(/\/$/, '');
     const userPath = `/api/users/${encodeURIComponent(user.name)}/projects`;
     const publicPath = `/api/public/projects`;
     const singlePath = (id = '{id}') => `/api/projects/${id}`;
