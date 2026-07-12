@@ -1,21 +1,12 @@
-'use client';
-
-
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { auth } from '@/app/auth';
+import { redirect } from 'next/navigation';
 import styles from '@/components/PortDeck.module.css';
 
-export default function RootPage() {
-	const router = useRouter();
-	
+export default async function RootPage() {
+	const session = await auth();
 
-
-	return (
-		<main className={styles.loaderScreen}>
-			<div className={styles.loaderStack}>
-				<div className={styles.loaderSpinner} />
-				<p className={styles.loaderText}>Loading PortDeck…</p>
-			</div>
-		</main>
-	);
+	if (!session) {
+		return redirect('/login');
+	}
+	redirect('/dashboard');
 }

@@ -8,7 +8,8 @@ import ProjectForm from './ProjectForm';
 import ProjectCard from './ProjectCard';
 import ProjectDetail from './ProjectDetail';
 import EndpointsPanel from './EndpointsPanel';
-import { LogoMarkIcon, PlusIcon, SearchIcon, SignOutIcon, SortIcon, GridIcon, ListIcon } from './icons';
+import { LogoMarkIcon, PlusIcon, SearchIcon, SortIcon, GridIcon, ListIcon } from './icons';
+import { LogoutButton } from './SignOut';
 import styles from './PortDeck.module.css';
 import type { Session } from 'next-auth';
 
@@ -129,10 +130,7 @@ export default function DashboardShell({ user, signOut }: DashboardShellProps) {
 				<div className={styles.dashboardAvatarName}>{displayName}</div>
 			</div>
 
-			<button onClick={signOut} className={styles.buttonSecondary} title="Sign out" aria-label="Sign out">
-				<SignOutIcon style={{ width: '1rem', height: '1rem' }} />
-				<span className="hidden md:inline">Sign out</span>
-			</button>
+			<LogoutButton />
 			</div>
 		</div>
 		</header>
