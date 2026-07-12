@@ -46,7 +46,7 @@ export async function GitHubSignupController(GitHubPayload: GitHubSignupPayload)
 	if (!email) return apiError("Email is required", 400);
 
 	try {
-		const existingUser = await get("SELECT * FROM users WHERE email = $1", [email]);
+		const existingUser = await get<{ id: number }>("SELECT id FROM users WHERE email = $1", [email]);
 
 		// Return early if they already exist
 		if (existingUser) return apiResponse("User already exists", 200);

@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import styles from './PortDeck.module.css';
 import { signUp } from '@/utils/auth';
-import { signIn, useSession } from 'next-auth/react'; // Cleaned client-side imports
+import { signIn as AuthSignIn, useSession } from 'next-auth/react';
 import { GitHubLoginButton } from '@/components/SignIn';
 
 interface AuthShellProps {
@@ -21,7 +21,6 @@ export default function AuthShell({ mode }: AuthShellProps) {
 	const [error, setError] = useState('');
 	const [isAuthenticating, setIsAuthenticating] = useState(false);
 
-	// Handle automated redirection if already logged in
 	useEffect(() => {
 		if (status === 'loading') {
 			setIsAuthenticating(true);
@@ -43,22 +42,24 @@ export default function AuthShell({ mode }: AuthShellProps) {
 		try {
 			if (mode === 'signup') {
 				const ok = await signUp({ name, email, password });
-				if (ok) {
-					router.replace('/dashboard');
-				} else {
+				if (!ok) {
 					setError('Sign up failed. Please check your credentials.');
 					setIsAuthenticating(false);
+					return;
 				}
-			} else {
-				// Handle Credentials login or standard action fallback
-				const result = await signIn('credentials', {
-					email,
-					password,
-					redirect: false,
+				await AuthSignIn('credentials', {
+					email, password, callbackUrl: '/dashboard'
 				});
-
+			} else {
+				const result = await AuthSignIn('credentials', {
+					email, password, redirect: false
+				});
 				if (result?.error) {
-					setError('Invalid email or password.');
+					if (result?.code) {
+						setError(result.code);
+					} else {
+						setError('Invalid email or password.');
+					}
 					setIsAuthenticating(false);
 				} else {
 					router.replace('/dashboard');
@@ -66,6 +67,8 @@ export default function AuthShell({ mode }: AuthShellProps) {
 			}
 		} catch (err) {
 			setError('An unexpected authentication error occurred.');
+			setIsAuthenticating(false);
+		} finally {
 			setIsAuthenticating(false);
 		}
 	};

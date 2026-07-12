@@ -12,9 +12,7 @@ export default function DashboardPage() {
 	const { data: session, status } = useSession();
 	const isReady = status !== 'loading';
 	const user: Session['user'] | null = useMemo(() => {
-		console.log(session, status);
-		if (!session?.user) return null;
-		return {
+		if (session?.user) return {
 			id: (session.user as { id?: string }).id ?? '',
 			name: session.user.name ?? '',
 			email: session.user.email ?? '',
