@@ -35,7 +35,7 @@ export default function AuthShell({ mode }: AuthShellProps) {
 		}
 	}, [status, session, router]);
 
-	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+	const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
 		e.preventDefault();
 		setError('');
 		setIsAuthenticating(true);
