@@ -1003,6 +1003,12 @@
   font-size: 0.75rem;
 }
 
+.dashboardAvatarWrap {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 .dashboardMain {
   margin: 0 auto;
   width: 100%;

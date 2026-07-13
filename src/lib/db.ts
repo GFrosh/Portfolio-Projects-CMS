@@ -112,6 +112,7 @@ async function ensureTables() {
 			id SERIAL PRIMARY KEY,
 			user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
 			title VARCHAR(255) NOT NULL,
+			short_description TEXT,
 			description TEXT,
 			github_url VARCHAR(255),
 			demo_url VARCHAR(255),

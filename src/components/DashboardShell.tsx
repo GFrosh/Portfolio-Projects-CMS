@@ -120,12 +120,11 @@ export default function DashboardShell({ user, signOut }: DashboardShellProps) {
 
 			<div className={styles.dashboardActions}>
 			<button onClick={() => setModal({ type: 'create' })} className={styles.buttonPrimary}>
+				<span className={styles.buttonText}>New Project</span>
 				<PlusIcon style={{ width: '1rem', height: '1rem' }} />
-				<span className="hidden sm:inline">New Project</span>
-				<span className="sm:hidden">New</span>
 			</button>
 
-			<div className="hidden sm:flex items-center gap-2 pl-3 border-l border-white/10">
+			<div className={styles.dashboardAvatarWrap} title={displayName}>
 				<div className={styles.dashboardAvatar} title={displayName}>{initials || 'U'}</div>
 				<div className={styles.dashboardAvatarName}>{displayName}</div>
 			</div>
@@ -246,7 +245,7 @@ export default function DashboardShell({ user, signOut }: DashboardShellProps) {
 
 		{modal?.type === 'create' && (
 		<Modal title="New project" subtitle="Add a new entry to your portfolio." onClose={closeModal} size="lg">
-			<ProjectForm submitLabel="Create project" onCancel={closeModal} onSubmit={(data) => { console.log(`Supposed to create project: ${data.title}`); closeModal(); }} />
+			<ProjectForm submitLabel="Create project" onCancel={closeModal} onSubmit={(data) => { console.log(`Supposed to create project: ${data}`); closeModal(); }} />
 		</Modal>
 		)}
 
