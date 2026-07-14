@@ -22,7 +22,7 @@ const EMPTY_FORM: ProjectFormData = {
 
 interface ProjectFormProps {
 	initial?: ProjectFormData;
-	onSubmit: (data: ProjectFormData) => void;
+	onSubmit: (data: string) => void;
 	onCancel: () => void;
 	submitLabel: string;
 }
@@ -93,7 +93,6 @@ export default function ProjectForm({ initial, onSubmit, onCancel, submitLabel }
 			}
 			const data = await res.json();
 			const repos = data.data as GitHubRepo[];
-			console.log('Fetched repos:', repos);
 			setGithubRepos(repos);
 			if (repos.length === 0) setGithubError('No public repositories found for this user.');
 		} catch (error) {
@@ -141,7 +140,7 @@ export default function ProjectForm({ initial, onSubmit, onCancel, submitLabel }
 	};
 
 	const handleSubmit = () => {
-		if (validate()) onSubmit(form);
+		if (validate()) onSubmit(JSON.stringify(form));
 	};
 
 	return (

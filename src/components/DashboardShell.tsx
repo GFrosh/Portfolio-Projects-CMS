@@ -12,6 +12,7 @@ import { LogoMarkIcon, PlusIcon, SearchIcon, SortIcon, GridIcon, ListIcon } from
 import { LogoutButton } from './SignOut';
 import styles from './PortDeck.module.css';
 import type { Session } from 'next-auth';
+import type { Project } from '@/utils/types';
 
 interface DashboardShellProps {
 	user: Session['user'];
@@ -57,7 +58,7 @@ export default function DashboardShell({ user, signOut }: DashboardShellProps) {
 				const res = await fetch('/api/projects');
 				if (!res.ok) throw new Error('Failed to load projects');
 				const data = await res.json();
-				if (!cancelled) setProjects(data);
+				if (!cancelled) setProjects(data.data || []);
 			} catch (err) {
 				if (!cancelled) setError(err instanceof Error ? err.message : 'Something went wrong');
 			} finally {
@@ -245,7 +246,23 @@ export default function DashboardShell({ user, signOut }: DashboardShellProps) {
 
 		{modal?.type === 'create' && (
 		<Modal title="New project" subtitle="Add a new entry to your portfolio." onClose={closeModal} size="lg">
-			<ProjectForm submitLabel="Create project" onCancel={closeModal} onSubmit={(data) => { console.log(`Supposed to create project: ${data}`); closeModal(); }} />
+			<ProjectForm submitLabel="Create project" onCancel={closeModal} onSubmit={async (data) => {
+				try {
+					const res = await fetch('/api/projects/new', {
+						method: 'POST',
+						headers: { 'Content-Type': 'application/json' },
+						body: data
+					});
+					const parsedData = await res.json();
+					if (!res.ok) throw new Error(JSON.stringify(parsedData.details) || 'Failed to create project');
+					closeModal();
+				} catch (error) {
+					setError(error instanceof Error ? error.message : 'Something went wrong');
+					console.error(error);
+				} finally {
+					setLoading(false);
+				}
+			}}/>
 		</Modal>
 		)}
 

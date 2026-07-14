@@ -120,7 +120,8 @@ async function ensureTables() {
 			tags TEXT[],
 			status VARCHAR(20) DEFAULT 'draft',
 			featured BOOLEAN DEFAULT FALSE,
-			created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+			created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+			updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 		);
 	`);
 	logger.info('✓ Tables ensured!');
