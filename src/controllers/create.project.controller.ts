@@ -5,11 +5,20 @@ import type { ProjectFormData } from "@/utils/types";
 
 export async function createProject(payload: ProjectFormData) {
     const session = await auth();
+
+	// USER AUTHORIZATION CHECK
+    if (!session || !session.user?.email) {
+		return apiError("Unauthorized", 401);
+	}
+
+	// USER ID RETRIEVAL
     const userId = await g<{ id: number }>(`SELECT id FROM users WHERE email = $1`, [session?.user?.email]);
     if (!userId) {
         return apiError("User not found", 404);
     }
-    
+
+
+	// SAVE PROJECT TO DATABASE
     const formattedTags = `{${payload.tags.map(t => `"${t}"`).join(',')}}`;
     try {
         const result = await q("INSERT INTO projects (title, user_id, short_description, description, tags, github_url, demo_url, image_url, status, featured, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, NOW(), NOW()) RETURNING id", [

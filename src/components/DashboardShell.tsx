@@ -8,26 +8,18 @@ import ProjectForm from './ProjectForm';
 import ProjectCard from './ProjectCard';
 import ProjectDetail from './ProjectDetail';
 import EndpointsPanel from './EndpointsPanel';
+import type { Session } from 'next-auth';
+import type { Project, ModalMode, FilterStatus, SortField, SortOrder } from '@/utils/types';
 import { LogoMarkIcon, PlusIcon, SearchIcon, SortIcon, GridIcon, ListIcon } from './icons';
 import { LogoutButton } from './SignOut';
+import formatDate from '@/utils/FormatDate';
 import styles from './PortDeck.module.css';
-import type { Session } from 'next-auth';
-import type { Project } from '@/utils/types';
 
 interface DashboardShellProps {
 	user: Session['user'];
 	signOut: () => Promise<void>;
 }
 
-type ModalMode =
-  | { type: 'create' }
-  | { type: 'edit'; project: any }
-  | { type: 'view'; project: any }
-  | { type: 'delete'; projectId: string; title: string };
-
-type FilterStatus = 'all' | 'published' | 'draft' | 'archived';
-type SortField = 'updatedAt' | 'createdAt' | 'title';
-type SortOrder = 'asc' | 'desc';
 
 const STATUS_OPTIONS: { value: FilterStatus; label: string }[] = [
   { value: 'all', label: 'All' },
@@ -45,7 +37,7 @@ export default function DashboardShell({ user, signOut }: DashboardShellProps) {
 	const [sortField, setSortField] = useState<SortField>('updatedAt');
 	const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
 	const [view, setView] = useState<'grid' | 'list'>('grid');
-	const [projects, setProjects] = useState<any[]>([]);
+	const [projects, setProjects] = useState<Project[]>([]);
 
 
 
@@ -58,7 +50,8 @@ export default function DashboardShell({ user, signOut }: DashboardShellProps) {
 				const res = await fetch('/api/projects');
 				if (!res.ok) throw new Error('Failed to load projects');
 				const data = await res.json();
-				if (!cancelled) setProjects(data.data || []);
+				const projects: Project[] = data.data || [];
+				if (!cancelled) setProjects(projects);
 			} catch (err) {
 				if (!cancelled) setError(err instanceof Error ? err.message : 'Something went wrong');
 			} finally {
@@ -80,15 +73,15 @@ export default function DashboardShell({ user, signOut }: DashboardShellProps) {
 		list = list.filter(
 			(p) =>
 			p.title.toLowerCase().includes(q) ||
-			p.description.toLowerCase().includes(q) ||
-			p.tags.some((t: any) => t.toLowerCase().includes(q)),
+			p.description?.toLowerCase().includes(q) ||
+			p.tags.some((t: string) => t.toLowerCase().includes(q)),
 		);
 		}
 		list.sort((a, b) => {
-		let cmp = 0;
-		if (sortField === 'title') cmp = a.title.localeCompare(b.title);
-		else cmp = new Date(a[sortField]).getTime() - new Date(b[sortField]).getTime();
-		return sortOrder === 'asc' ? cmp : -cmp;
+			let cmp = 0;
+			if (sortField === 'title') cmp = a.title.localeCompare(b.title);
+			else cmp = new Date(a.updated_at).getTime() - new Date(b.updated_at).getTime();
+			return sortOrder === 'asc' ? cmp : -cmp;
 		});
 		return list;
 	}, [projects, search, filterStatus, sortField, sortOrder]);
@@ -235,7 +228,7 @@ export default function DashboardShell({ user, signOut }: DashboardShellProps) {
 				project={project}
 				onView={() => setModal({ type: 'view', project })}
 				onEdit={() => setModal({ type: 'edit', project })}
-				onDelete={() => setModal({ type: 'delete', projectId: project.id, title: project.title })}
+				onDelete={() => setModal({ type: 'delete', projectId: String(project.id), title: project.title })}
 				/>
 			))}
 			</div>
@@ -301,7 +294,7 @@ export default function DashboardShell({ user, signOut }: DashboardShellProps) {
 	);
 	}
 
-	function ProjectRow({ project, onView, onEdit, onDelete }: { project: any; onView: () => void; onEdit: () => void; onDelete: () => void; }) {
+	function ProjectRow({ project, onView, onEdit, onDelete }: { project: Project; onView: () => void; onEdit: () => void; onDelete: () => void; }) {
 	const statusClass = project.status === 'published' ? styles.statusPublished : project.status === 'draft' ? styles.statusDraft : styles.statusArchived;
 	const statusDot = project.status === 'published' ? styles.statusDotPublished : project.status === 'draft' ? styles.statusDotDraft : styles.statusDotArchived;
 
@@ -323,24 +316,28 @@ export default function DashboardShell({ user, signOut }: DashboardShellProps) {
 		</div>
 		<div className={styles.rowBody}>
 			<div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
-			<p className={styles.rowTitle}>{project.title || 'Untitled'}</p>
-			<span className={`${styles.projectCardStatus} ${statusClass}`}>
+				<p className={styles.rowTitle}>{project.title || 'Untitled'}</p>
+				<span className={`${styles.projectCardStatus} ${statusClass}`}>
 				<span className={`h-1.5 w-1.5 rounded-full ${statusDot}`} />
-				{project.status}
-			</span>
-			{project.featured && <span className={styles.heroKicker} style={{ fontSize: '0.625rem' }}>★ Featured</span>}
+					{project.status}
+				</span>
+				<div>
+					{project.featured && <span className={styles.heroKicker} style={{ fontSize: '0.625rem' }}>★ Featured</span>}
+				</div>
+				<p className={styles.rowDescription}>{project.description || 'No description'}</p>
 			</div>
-			<p className={styles.rowDescription}>{project.description || 'No description'}</p>
 		</div>
 		</button>
 
 		<div className={styles.rowMeta}>
-		{new Date(project.updatedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+			<p>
+				{formatDate(project.updated_at)}
+			</p>
 		</div>
 
 		<div className={styles.rowActions}>
-		<button onClick={onEdit} className={styles.rowActionButton}>Edit</button>
-		<button onClick={onDelete} className={`${styles.rowActionButton} ${styles.rowActionDanger}`}>Delete</button>
+			<button onClick={onEdit} className={styles.rowActionButton}>Edit</button>
+			<button onClick={onDelete} className={`${styles.rowActionButton} ${styles.rowActionDanger}`}>Delete</button>
 		</div>
 	</article>
 	);

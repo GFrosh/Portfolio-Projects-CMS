@@ -20,6 +20,8 @@ export interface ProjectRow {
 
 
 export interface Project {
+	id: number;
+	userId: number;
 	title: string;
 	shortDescription: string;
 	description?: string;
@@ -30,7 +32,7 @@ export interface Project {
 	status: ProjectStatus;
 	featured: boolean;
 	createdAt: string;
-	updatedAt: string;
+	updated_at: string;
 }
 
 
@@ -60,3 +62,9 @@ export interface GitHubRepo {
   forks_count: number;
   open_issues_count: number;
 }
+
+export type ModalMode =
+  | { type: 'create' }
+  | { type: 'edit'; project: any }
+  | { type: 'view'; project: any }
+  | { type: 'delete'; projectId: string; title: string };
